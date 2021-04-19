@@ -21,8 +21,11 @@ def callfaultTolerance(module_name) :
 
     json_object = json.dumps(to_send)
     fault_tolerance_url = 'http://host.docker.internal:6969/faulty'
-    resp = requests.post(fault_tolerance_url, json = to_send)
-    print(resp.text)
+    try :
+        resp = requests.post(fault_tolerance_url, json = to_send)
+        print(resp.text)
+    except :
+        print("Can't connect to Fault Tolerance Module")
     # communicate fault tolerance 
 
 def update_status() :
