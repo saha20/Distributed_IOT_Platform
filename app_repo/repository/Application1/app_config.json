@@ -1,0 +1,48 @@
+{
+	"Application1" :
+	{
+		"developer_id" : "user_1",
+		"application_id" : "Application1",
+		"algorithms" :
+		{
+			"algo1":
+			{
+				"code" : "control_sewing_service.py",
+				"environment":
+				{
+					"python3-alpine" : "False",
+					"flask" : "False",
+					"python3-packages":[]
+				},
+				"dependency" : 
+				{
+				},
+				"sensors":
+				{
+					"senosr_type_1" : "stitch_setting",
+					"senosr_type_2" : "thread_remaining",
+					"senosr_type_3" : "hook_rotation"
+				}
+			},
+			"algo2":
+			{
+				"code" : "control_dyeing_service.py",
+				"environment":
+				{
+					"python3" : "False",
+					"flask" : "False",
+					"python3-packages":[]
+				},
+				"dependency" : 
+				{
+				},
+				"sensors" :
+				{
+					"senosr_type_1" : "temperature_sensors",
+					"senosr_type_2" : "color_sensor",
+					"senosr_type_3" : "camera_sensor"
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,5 @@
+kafka-python
+pymongo
+flask
+requests
+faker
