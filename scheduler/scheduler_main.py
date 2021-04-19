@@ -223,13 +223,13 @@ def manage_request(request):
 	global scheduler
 	for appname in request:
 		for algo_name in request[appname]["algorithms"]:
-			sensors = request[appname]["algorithms"][algo_name]["sensors"]
+			place_id = request[appname]["algorithms"][algo_name]["place_id"]
 			new_request = {
 				"user_id" : request[appname]["user_id"],
 				"app_id" : request[appname]["application_name"],
 				"service_name_to_run" : algo_name,
 				"service_id" : None, #service_id
-				"sensors" : sensors,
+				"place_id" : place_id,
 				"action" : request[appname]["algorithms"][algo_name]["action"]
 			}
 			schedule = request[appname]["algorithms"][algo_name]["schedule"]
