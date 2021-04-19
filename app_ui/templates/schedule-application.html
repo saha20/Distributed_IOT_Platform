@@ -1,0 +1,174 @@
+{% extends 'site_template.html' %}
+
+{% block body %}
+
+        <div id="page-wrapper">
+
+            <div class="container-fluid">
+
+                <!-- Page Heading -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <h1 class="page-header">
+                            Schedule Application
+                        </h1>
+                        <ol class="breadcrumb">
+                            <li>
+                                <i class="fa fa-dashboard"></i>  <a href="/">Dashboard</a>
+                            </li>
+                            <li class="active">
+                                <i class="fa fa-edit"></i> Schedule Application
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+                <!-- /.row -->
+
+                <div class="row">
+
+                    <form method="POST" action="/scheduling_request/" enctype="multipart/form-data">
+
+                        <div class="col-lg-6">
+
+                                <div class="form-group">
+                                    <label>Select Application</label>
+                                    <select class="form-control" name="application_name" id="app_name">
+                                        <option value="Application1">Application 1</option>
+                                        <option value="Application2">Application 2</option>
+                                        <option value="Application3">Application 3</option>
+                                        <option value="Application4">Application 4</option>
+                                        <option value="Application5">Application 5</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Select Algorithms/Service</label>
+                                    <select class="form-control" name="algorithms" id="algorithms">
+                                        <option value="Algorithm1">Algorithm 1</option>
+                                        <option value="Algorithm2">Algorithm 2</option>
+                                        <option value="Algorithm3">Algorithm 3</option>
+                                        <option value="Algorithm4">Algorithm 4</option>
+                                        <option value="Algorithm5">Algorithm 5</option>
+                                    </select>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label>Schedule Service</label>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="isScheduled" id="option1" value=True checked>Later
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="isScheduled" id="optionsRadios2" value=False>Immediately
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Enter start time of service</label>
+                                    <input class="form-control" id="startTime" name="startTime" placeholder="hh:mm:ss,hh:mm:ss">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Enter duration of service</label>
+                                    <input class="form-control" id="duration" name="duration" placeholder="hh:mm:ss,hh:mm:ss">
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label>Select days of week to schedule service</label>
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" value=True name="mon" id="mon">Monday
+                                        </label>
+                                    </div>
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" value=True name="tue" id="tue">Tuesday
+                                        </label>
+                                    </div>
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" value=True name="wed" id="wed">Wednesday
+                                        </label>
+                                    </div>
+
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" value=True name="thu" id="thu">Thursday
+                                        </label>
+                                    </div>
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" value=True name="fri" id="fri">Friday
+                                        </label>
+                                    </div>
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" value=True name="sat" id="sat">Saturday
+                                        </label>
+                                    </div>
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox" value=True name="sun" id="sun">Sunday
+                                        </label>
+                                    </div>
+                                </div>
+
+                        </div>
+                        <div class="col-lg-6">
+                            <h3>Input Action to the user</h3>
+                            <div class="form-group">
+                                <label>Input message for the user</label>
+                                <textarea class="form-control" rows="3" name="message" id="message"></textarea>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label>Enter email address</label>
+                                <input type="email" name="email" id="email" tabindex="1" class="form-control"
+                                       placeholder="Email Address" value="">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Enter phone no.</label>
+                                <input type="mobile" name="mobile" id="mobile" tabindex="1" class="form-control"
+                                       placeholder="Phone No." value="">
+                            </div>
+
+                            
+                            <div class="form-group">
+                                <label>Enter Latitude & Longitude</label>
+                                <textarea class="form-control" rows="3" placeholder="23.45:45.45,23.45:45.45" name="location" id="location"></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-default">Schedule</button>
+                            <button type="reset" class="btn btn-default">Reset</button>
+                        </div>
+                        
+                    </form>
+
+                    <form method="POST" action="/download" enctype="multipart/form-data">
+                        <div class="col-lg-6">
+                            <label>Download template.json for scheduling multiple request</label>
+                            <button type="submit" class="btn btn-default">Download</button>
+                        </div>
+                    </form>
+
+                    <form method="POST" action="/scheduling_request_upload/" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label>Upload Request file to schedule an application</label>
+                            <input type="file" name="file">
+                        </div>
+
+                        <button type="submit" class="btn btn-default">Upload</button>
+                        <button type="reset" class="btn btn-default">Reset</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+{% endblock %}
