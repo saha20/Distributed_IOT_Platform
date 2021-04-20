@@ -224,12 +224,22 @@ def manage_request(request):
 	for appname in request:
 		for algo_name in request[appname]["algorithms"]:
 			place_id = request[appname]["algorithms"][algo_name]["place_id"]
+			lat = request[appname]["algorithms"][algo_name]["latitude"]
+			long = request[appname]["algorithms"][algo_name]["longitude"]
+			if place_id == "":
+				place_id = "default"
+			if lat == "":
+				lat = "0"
+			if long == "":
+				long = "0"
 			new_request = {
 				"user_id" : request[appname]["user_id"],
 				"app_id" : request[appname]["application_name"],
 				"service_name_to_run" : algo_name,
 				"service_id" : None, #service_id
 				"place_id" : place_id,
+				"latitude" : lat,
+				"longitude" : long,
 				"action" : request[appname]["algorithms"][algo_name]["action"]
 			}
 			schedule = request[appname]["algorithms"][algo_name]["schedule"]
