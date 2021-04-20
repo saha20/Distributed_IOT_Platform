@@ -212,7 +212,7 @@ def manage_immediate_request(scheduler, schedule, request, appname, algo_name):
 		"repeating" : False,
 		"app_name" : appname,
 		"algo_name" : algo_name,
-		"value" : request
+		"value" : request.copy()
 	}
 	print("Scheduling : ")
 	print(f"Start time : {start_time}")
