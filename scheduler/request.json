@@ -17,9 +17,7 @@
                     "sensor_manager" : [{"sensor_id1" : "command1"}],
                     "notify_user" : {}
                 },
-                "place_id" : "Himalaya 105",
-                "latitude" : "42.20",
-                "longitude" : "55.33"
+                "place_id" : "Himalaya 105"
             },
             "algorithm2" : {
                 "isScheduled" : false,
@@ -31,9 +29,7 @@
                     "days" : ["Monday", "Thursday", "Friday", "Saturday", "Sunday"]
                 },
                 "action" : {},
-                "place_id" : "Himalaya 205",
-                "latitude" : "46.20",
-                "longitude" : "25.33"
+                "place_id" : "Himalaya 205"
             }
         }
     }
