@@ -8,7 +8,7 @@ import sys
 import json
 import time , threading , json , os, sys
 from time import sleep
-
+import service_heartbeat as sh
 # from kafka import KafkaProducer
 # sewing service, 
 # under thread_residual_quantity
@@ -114,10 +114,18 @@ from time import sleep
 # 			producer.flush() 
 # 			time.sleep(3)
 
-if __name__ == '__main__':
-	# main()
-	os.system('mkdir "101"')
+def thread_func():
 	while True:
+		print("in main thread")
 		a=1
+
+if __name__ == '__main__':
+	# sh.sendHeartbeat(sys.argv[3])
+	# main()
+	thread2 = threading.Thread(target = sh.sendHeartbeat, args=[sys.argv[3]])
+	thread2.start()
+	# os.system('mkdir "101"')
+	thread3 = threading.Thread(target = thread_func)
+	thread3.start()
 	
 
