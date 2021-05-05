@@ -135,7 +135,7 @@ def get_files_from_UI():
 if __name__ == "__main__":
 	thread1 = threading.Thread(target = heartBeat)
 	thread1.start()
-	get_files_from_UI()
+	# get_files_from_UI()
 	app.run(host= '0.0.0.0', port=app_repo_port, debug=False)
 	# app.run(host=socket.gethostbyname(socket.gethostname()), port=app_repo_port, debug=False)
 	# t1 = threading.Thread(target=initiateAppRepo)

@@ -1,9 +1,9 @@
 {
     "myapp" : {
         "user_id" : "divyansh",
-        "application_name" : "myapp",
+        "application_name" : "Application1",
         "algorithms" : {
-            "algorithm1" : {
+            "algo1" : {
                 "isScheduled" : true,
                 "schedule" : {
                     "time" : {
@@ -17,19 +17,7 @@
                     "sensor_manager" : [{"sensor_id1" : "command1"}],
                     "notify_user" : {}
                 },
-                "place_id" : "Himalaya 105"
-            },
-            "algorithm2" : {
-                "isScheduled" : false,
-                "schedule" : {
-                    "time" : {
-                        "startTimes" : ["13:15:20"],
-                        "durations" : ["00:00:15"]
-                    },
-                    "days" : ["Monday", "Thursday", "Friday", "Saturday", "Sunday"]
-                },
-                "action" : {},
-                "place_id" : "Himalaya 205"
+                "place_id" : "GGG_ground_floor_1"
             }
         }
     }
