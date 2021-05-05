@@ -26,9 +26,8 @@ dburl = "mongodb://apurva:user123@cluster0-shard-00-00.p4xv2.mongodb.net:27017,c
 db_name = "IAS_test_1"
 
 # kafka
-
-KAFKA_PLATFORM_IP = 'kafka:9092'
-# KAFKA_PLATFORM_IP = 'localhost:9092'
+# KAFKA_PLATFORM_IP = 'kafka:9092'
+KAFKA_PLATFORM_IP = 'localhost:9092'
 action_manager_topic = "actionManager_to_sensorManager"
 
 # ports

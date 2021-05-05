@@ -2,8 +2,8 @@ from sensor_package import *
 import multiprocessing
 
 collection_name = sensor_instance_collection   # sensors_registered_document
-logging_collection = "logger_current"
-logging_archive = "logger_archive"
+logging_collection = "sensor_manager_logger_current"
+logging_archive = "sensor_manager_logger_archive"
 
 stop_state = "stopped"
 running_state = "running"
@@ -273,21 +273,22 @@ Step1: consumer reads/consumes all the data from the topic->topic (where sensors
 Then we iterate through the consumer to get all the msgs that the consumer has read, and send those messages, as producer, to topic->temptopic. From this temptopic, the applications/etc can get the sensor data via sensor mgr
 '''
 
-def dump_data(ip, topic, serviceid, temptopic, sensor_id, sensor_name):
-	data_rate = 1
-	# 13 April change
-	print("in dump data")
-	print("from the topic :",topic)
-	group_id_temp_topic = smgid + str(temptopic)
-	consumer = KafkaConsumer('sensor_topic_15', bootstrap_servers=[KAFKA_PLATFORM_IP], auto_offset_reset = "latest",group_id=group_id_temp_topic )
-	producer = KafkaProducer(bootstrap_servers=[KAFKA_PLATFORM_IP],value_serializer=json_serializer)
-	for message in consumer:
-		value = message.value.decode('utf-8')
-		msg = sensor_id + "#" + sensor_name + "#" + value
-		print("msg ",msg)
-		producer.send(temptopic, msg)
-		producer.flush()
-		time.sleep(int(data_rate))
+# def dump_data(ip, topic, serviceid, temptopic, sensor_id, sensor_name):
+# 	data_rate = 1
+# 	# 13 April change
+# 	print("in dump data")
+# 	print("from the topic :",topic)
+# 	group_id_temp_topic = smgid + str(temptopic)
+# 	consumer = KafkaConsumer('sensor_topic_15', bootstrap_servers=[KAFKA_PLATFORM_IP], auto_offset_reset = "latest",group_id=group_id_temp_topic )
+# 	producer = KafkaProducer(bootstrap_servers=[KAFKA_PLATFORM_IP],value_serializer=json_serializer)
+# 	for message in consumer:
+# 		value = message.value.decode('utf-8')
+# 		value = str(value)
+# 		msg = sensor_id + "#" + sensor_name + "#" + value
+# 		print("msg ",msg)
+# 		producer.send(temptopic, msg)
+# 		producer.flush()
+# 		time.sleep(int(data_rate))
 
 def listen_action_manager():
 	consumer = KafkaConsumer(str(action_manager_topic), bootstrap_servers=[KAFKA_PLATFORM_IP], auto_offset_reset = "earliest")
@@ -313,8 +314,6 @@ def bind_sensor_data_to_temptopic(sensor_topic_id_name_list_for_all_sensors, ser
 
 	for i in range(len(sensor_topic_id_name_list_for_all_sensors)):
 		ip, topic, sensor_id, sensor_name = sensor_topic_id_name_list_for_all_sensors[i].split('#')
-		# print("ip and topic are :")
-		# print(ip+" "+topic)
 		list_of_topics.append(topic)
 		list_of_sensor_names.append(sensor_name)
 		list_of_sensor_ids.append(sensor_id)

@@ -4,8 +4,6 @@ import multiprocessing
 #not using sensorlogs
 
 collection_name = "sensors_registered"   #sensor_document
-logging_collection = "sensor_manager_logger_current"
-logging_archive = "sensor_manager_logger_archive"
 
 stop_state = "stopped"
 running_state = "running"

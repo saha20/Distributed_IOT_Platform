@@ -4,7 +4,7 @@ import os , time , json
 import threading
 import multiprocessing
 from kafka import KafkaProducer , KafkaConsumer
-
+from sensor_package import *
 
 folder = ""
 
@@ -48,7 +48,7 @@ def json_serializer(data):
 	return json.dumps(data).encode("utf-8")
 
 def heartBeat():
-	kafka_platform_ip = 'kafka:9092'
+	kafka_platform_ip = KAFKA_PLATFORM_IP
 	producer = KafkaProducer(bootstrap_servers=[kafka_platform_ip],value_serializer =json_serializer)
 	while True:
 		t = time.localtime()
@@ -82,7 +82,7 @@ if __name__ == '__main__':
 	# print("Enter exit() command to stop.")
 	# threading.Thread(target=listen_exit).start()
 
-	file_names = ["sensor_catalogue_registration.py","sensor_instance_registation.py","start_sensor_covid_app.py","start_sensor_manuf.py","sensor_manager.py"]
+	file_names = ["sensor_catalogue_registration.py","sensor_instance_registation.py","start_sensor_all.py","sensor_manager.py"]
 	
 	for fname in file_names:
 		target_file = os.path.join(folder,fname)
