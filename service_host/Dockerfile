@@ -28,7 +28,9 @@ RUN pip3 install --no-cache-dir -r load_server/requirements.txt
 EXPOSE 22
 EXPOSE 5000
 
-CMD    bash /load_server/script.sh && /usr/sbin/sshd -D
+CMD	   python3 -u load_server/container_server.py &
+CMD    /usr/sbin/sshd -D
+#CMD    bash /load_server/script.sh && /usr/sbin/sshd -D
 #["bash","script.sh ","&&","/usr/sbin/sshd", "-D"]
 
 
