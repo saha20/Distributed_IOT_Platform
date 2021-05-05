@@ -32,7 +32,11 @@ def stopSensorManagerUtil():
 def sensorManagerUtil():
 
 	data = request.get_json(force=True)
-	correctly_parsed_outer_json, userid, applicationName, servicename, serviceid, latitude, longitude, config_file, not_correct_list  = parse_request_sensor_manager(data)
+
+	# change for place id
+	# correctly_parsed_outer_json, userid, applicationName, servicename, serviceid,latitude, longitude, config_file, not_correct_list  = parse_request_sensor_manager(data)
+	
+	correctly_parsed_outer_json, userid, applicationName, servicename, serviceid, place_id, config_file, not_correct_list  = parse_request_sensor_manager(data)
 	
 	if(correctly_parsed_outer_json == False):
 		msg = "Fields "
@@ -47,18 +51,22 @@ def sensorManagerUtil():
 
 	#list of all sensors used for this service
 	correctly_parsed_inner_json, required_sensor_types_list, msg = get_sensor_types_list_in_service(config_file, servicename, applicationName)
-	
-
 	if(correctly_parsed_inner_json == False):
 		res = { 
 			'Error' : msg
 		}
 		return jsonify(res)
 
+	print("required_sensor_types_list : ")
+	print(required_sensor_types_list)
 
 
 	# get sensor topic using the sensor types and location
-	got_nearest_sensors, sensor_topic_id_name_list_for_all_sensors, sensor_instances_not_registered_list = get_sensor_topic(required_sensor_types_list, latitude, longitude)
+	# got_nearest_sensors, sensor_topic_id_name_list_for_all_sensors, sensor_instances_not_registered_list = get_sensor_topic(required_sensor_types_list, latitude, longitude)
+
+	# change for place id
+	latitude, longitude = get_location_from_place_id(place_id)
+	got_nearest_sensors, sensor_topic_id_name_list_for_all_sensors, sensor_instances_not_registered_list = get_sensor_topic(required_sensor_types_list, place_id, latitude, longitude)
 	
 
 	if(got_nearest_sensors == False):
@@ -91,6 +99,12 @@ def sensorManagerUtil():
 
 if __name__ == '__main__':
 	print("Inside sensor_manager")
+
+	# global cluster
+	# cluster = MongoClient(dburl)
+	# global db 
+	# db = cluster[db_name]
+
 	
 	# start listening to the action manager
 	main_pid = os.getpid()
