@@ -9,7 +9,7 @@ Original file is located at
 
 import threading
 from flask import Flask, jsonify, request
-# from kafka import KafkaProducer , KafkaConsumer
+from kafka import KafkaProducer , KafkaConsumer
 
 import json
 import requests as rq
