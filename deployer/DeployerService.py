@@ -197,8 +197,8 @@ def initiateDeployer():
 
 
 if __name__ == '__main__':
-	# thread1 = threading.Thread(target = heartBeat)
-	# thread1.start()
+	thread1 = threading.Thread(target = heartBeat)
+	thread1.start()
 	print("Start Deployer Server\n")
 	thread2 = threading.Thread(target = initiateDeployer)
 	thread2.start()
