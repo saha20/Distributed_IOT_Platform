@@ -1,6 +1,6 @@
 import os.path
 from os import path
-# from kafka import KafkaProducer , KafkaConsumer
+from kafka import KafkaProducer , KafkaConsumer
 import zipfile
 import requests as rq
 import json , time

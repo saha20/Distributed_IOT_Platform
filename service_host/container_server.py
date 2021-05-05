@@ -19,5 +19,6 @@ def returnServer():
      )
     
 if __name__ == "__main__":
-    app.run(host=socket.gethostbyname(socket.gethostname()),port=5000)
+    # app.run(host=socket.gethostbyname(socket.gethostname()),port=5000)
+    app.run(host= '0.0.0.0',port=5000)
    

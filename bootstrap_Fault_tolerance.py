@@ -2,12 +2,21 @@ import os , sys , time , threading , multiprocessing , json , subprocess , pymon
 import random , socket
 from flask import Flask,jsonify , request
 
+dburl = "mongodb://apurva:user123@cluster0-shard-00-00.p4xv2.mongodb.net:27017,cluster0-shard-00-01.p4xv2.mongodb.net:27017,cluster0-shard-00-02.p4xv2.mongodb.net:27017/IAS_test_1?ssl=true&replicaSet=atlas-auz41v-shard-0&authSource=admin&retryWrites=true&w=majority"
+db_name = "IAS_test_1"
 mapping ={}
+collection_names = [ 
+	"ServiceInformation" , 
+	"deployer_logs",
+	"host_log",
+	"logger_current",
+	]
+	
 modules_to_bootstrap = [ 
 	'app_repo' , 
+	'scheduler' , 
 	'load_balancer' , 
 	'deployer', 
-	'scheduler' , 
 	'action_manager' , 
 	'sensor_manager' , 
 	'worker_node_1' , 
@@ -20,8 +29,7 @@ def get_ip(module_name):
 	return os.popen(cmd).read().strip()
 
 def start_worker(module_name):
-	dburl = "mongodb://apurva:user123@cluster0-shard-00-00.p4xv2.mongodb.net:27017,cluster0-shard-00-01.p4xv2.mongodb.net:27017,cluster0-shard-00-02.p4xv2.mongodb.net:27017/IAS_test_1?ssl=true&replicaSet=atlas-auz41v-shard-0&authSource=admin&retryWrites=true&w=majority"
-	db_name = "IAS_test_1"
+	global dburl    ,   db_name
 	myclient = pymongo.MongoClient(dburl)
 	mydb = myclient[db_name]
 	hostcol = mydb["host_log"]
@@ -154,7 +162,19 @@ def up_machine(module_name):
 		ip = start_machine(module_name,ports)
 	return ip
 
+def delete_logs():
+	global dburl    ,   db_name , collection_names
+	client = pymongo.MongoClient(dburl)
+	# mydb = myclient[db_name]
+   
+	for col in collection_names:
+		database = client[db_name][col]
+		database.delete_many({})
+		print(f"Cleared log for {col} database")
+
+
 if __name__ == '__main__':
+	delete_logs()
 	zoo_ip = start_zookeeper()
 	mapping['zookeeper'] = zoo_ip
 	kafka_ip = start_kafka()

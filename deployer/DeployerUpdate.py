@@ -15,7 +15,7 @@ import time as t
 # import pandas as pd
 import json
 from pathlib import Path
-# from kafka import KafkaConsumer, KafkaProducer
+from kafka import KafkaConsumer, KafkaProducer
 import os
 import paramiko
 import pymongo
