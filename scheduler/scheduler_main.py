@@ -1,8 +1,8 @@
 from datetime import datetime, timedelta
 from time import sleep
 import time
-from kafka import KafkaProducer , KafkaConsumer
 from flask import Flask, jsonify, request
+from kafka import KafkaProducer , KafkaConsumer
 import threading
 import heapq
 import json
@@ -10,6 +10,9 @@ import requests
 import pymongo
 import sys
 
+MONGO_SERVER_URL = "mongodb://apurva:user123@cluster0-shard-00-00.p4xv2.mongodb.net:27017,cluster0-shard-00-01.p4xv2.mongodb.net:27017,cluster0-shard-00-02.p4xv2.mongodb.net:27017/IAS_test_1?ssl=true&replicaSet=atlas-auz41v-shard-0&authSource=admin&retryWrites=true&w=majority"
+MONGO_DB_NAME = "IAS_test_1"
+MONGO_COLLECTION_NAME = "ServiceInformation"
 
 '''
 	Start Service Deployment Route : /startdeployment
@@ -32,11 +35,12 @@ WEEK_DAYS = {
 
 class Scheduler:
 	def __init__(self):
-		self.client = pymongo.MongoClient("mongodb+srv://7empest:7empest@cluster0.ebhli.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
-		self.database = self.client.IAS['ServiceInformation']
+		self.client = pymongo.MongoClient(MONGO_SERVER_URL)
+		self.database = self.client[MONGO_DB_NAME][MONGO_COLLECTION_NAME]
 		self.id = self.database.count_documents({})
 		self.scheduling_queue = list()
 		self.running_queue = list()
+		self.aborted_ids = set()
 		if self.id != 0:
 			self.restore_state()
 
@@ -142,6 +146,9 @@ def poll_scheduler_end(scheduler):
 	for _ in range(POLL_DURATION):
 		end_req_list = scheduler.poll_running_queue()
 		for req in end_req_list:
+			if req['service_id'] in scheduler.aborted_ids:
+				scheduler.aborted_ids.remove(req['service_id'])
+				continue
 			print("End Request :",req['service_id'], req["user_id"], req["app_id"], req["service_name_to_run"])
 			new_thread = threading.Thread(target=scheduler.update_status_in_database, args=(int(req['service_id']), 'terminated'))
 			new_thread.start()
@@ -193,7 +200,7 @@ def manage_scheduled_request(scheduler, schedule, request, appname, algo_name):
 			scheduler.add_request(schedule_req.copy())
 
 
-def manage_immediate_request(scheduler, schedule, request, appname, algo_name):
+def manage_immediate_request(scheduler, schedule, request, appname, algo_name, end_time):
 	'''
 	NOTE : for immediate requests we will still need the end time because start time will be
 	immediate. So make sure it's filled in the JSON and it's only a one time schedule.
@@ -201,10 +208,11 @@ def manage_immediate_request(scheduler, schedule, request, appname, algo_name):
 	'''
 	start_time = datetime.now()
 	# request["service_id"] = str(scheduler.id)
-	h, m, s = schedule["time"]["durations"][0].split(":")
-	h, m, s = int(h), int(m), int(s)
-	duration = timedelta(hours=h, minutes=m, seconds=s)
-	end_time = start_time + duration
+	if end_time is None:
+		h, m, s = schedule["time"]["durations"][0].split(":")
+		h, m, s = int(h), int(m), int(s)
+		duration = timedelta(hours=h, minutes=m, seconds=s)
+		end_time = start_time + duration
 
 	schedule_req = {
 		"start_time" : start_time,
@@ -236,13 +244,57 @@ def manage_request(request):
 			if request[appname]["algorithms"][algo_name]["isScheduled"]:
 				manage_scheduled_request(scheduler, schedule, new_request, appname, algo_name)
 			else:
-				manage_immediate_request(scheduler, schedule, new_request, appname, algo_name)
+				manage_immediate_request(scheduler, schedule, new_request, appname, algo_name, None)
 				
 def json_deserializer(data):
 	return json.dumps(data).decode('utf-8')
 
 def json_serializer(data):
 	return json.dumps(data).encode("utf-8")
+
+app = Flask(__name__)
+
+@app.route("/schedule_request", methods=["POST"])
+def register_appliction():
+	user_req = request.json
+	manage_request(user_req)
+	return jsonify({"msg" : "ok"})
+
+@app.route("/aborted_service/<int:aborted_service_id>", methods=["GET"])
+def handle_aborted_service(aborted_service_id):
+	global scheduler
+	aborted_service_id = int(aborted_service_id)
+	print("GOT ABORT REQUEST FOR SERVICE ID :", aborted_service_id)
+	document = scheduler.database.find_one({"_id":aborted_service_id})
+	if document is None or document == {}:
+		return jsonify({"ERROR":"The given Service id could not be found !"})
+	full_data = document["data"]
+	to_deployer = full_data["value"] #This is the part that needs to be resent to the deployer
+	scheduler.update_status_in_database(aborted_service_id, "ABORTED")
+	scheduler.aborted_ids.add(aborted_service_id)
+
+	#Sending a new immediate request to the deployer for re-deployment.
+	appname = to_deployer["app_id"]
+	algo_name =  to_deployer["service_name_to_run"]
+	place_id = to_deployer["place_id"]
+	action_info = to_deployer["action"]
+	new_request = {
+		"user_id" : to_deployer["user_id"],
+		"app_id" : appname,
+		"service_name_to_run" : algo_name,
+		"service_id" : None, #service_id
+		"place_id" : place_id,
+		"action" : action_info
+	}
+	'''
+	schedule = request[appname]["algorithms"][algo_name]["schedule"]
+	if request[appname]["algorithms"][algo_name]["isScheduled"]:
+		manage_scheduled_request(scheduler, schedule, new_request, appname, algo_name)
+	else:
+	'''
+	end_time = full_data["end_time"]
+	manage_immediate_request(scheduler, None, new_request, appname, algo_name, end_time)
+	return jsonify({"msg" : "ok"})
 
 
 def heartBeat():
@@ -258,15 +310,6 @@ def heartBeat():
 		producer.flush()
 		time.sleep(3)
 
-
-
-app = Flask(__name__)
-
-@app.route("/schedule_request", methods=["POST"])
-def register_appliction():
-	user_req = request.json
-	manage_request(user_req)
-	return jsonify({"msg" : "ok"})
 
 if __name__ == '__main__':
 	thread1 = threading.Thread(target = heartBeat)
