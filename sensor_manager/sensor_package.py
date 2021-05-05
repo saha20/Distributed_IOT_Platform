@@ -28,17 +28,8 @@ db_name = "IAS_test_1"
 # kafka
 
 KAFKA_PLATFORM_IP = 'kafka:9092'
+# KAFKA_PLATFORM_IP = 'localhost:9092'
 action_manager_topic = "actionManager_to_sensorManager"
-smgid = "consumer_group_sensor_manager"
-
-# simulator
-
-def get_sensors(number_of_sensors_to_be_simulated):
-	sensor_ids_sim = []
-	for i in range(number_of_sensors_to_be_simulated+1):
-		sensor_ids_sim.append(str(i))
-	return sensor_ids_sim
-
 
 # ports
 
@@ -46,9 +37,21 @@ manager_port = 5050
 instance_reg_port = 7072
 catalogue_reg_port = 7071
 
+# sensor_catalogue_collection = "sensor_catalogue_demo"
+# sensor_instance_collection = "sensors_registered_demo"
+sensor_catalogue_collection = "sensor_catalogue"
+sensor_instance_collection = "sensors_registered"
+place_details_collection = "place_collection"
+sensor_topic_details_collection = "sensor_topics_collection"
+
 # functions
 
 def json_serializer(data):
 	return json.dumps(data).encode("utf-8")
 
+def collection_to_json(col):
+	cursor = col.find()
+	list_cur = list(cursor)
+	json_data = dumps(list_cur)
+	return json_data
 

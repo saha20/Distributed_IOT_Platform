@@ -1,7 +1,7 @@
 from sensor_package import * 
 import multiprocessing
 
-collection_name = sensor_instance_collection   # sensors_registered_document
+collection_name = "sensors_registered"   # sensors_registered_document
 logging_collection = "logger_current"
 logging_archive = "logger_archive"
 
@@ -14,9 +14,6 @@ stop_command = "stop"
 
 proceesses_running = []
 
-cluster = None
-db = None
-
 '''
 Below are the keys in the json that we get to serve a service
 '''
@@ -24,10 +21,11 @@ app_config_username = "username"
 app_config_applicationname = "applicationname"
 app_config_servicename = "servicename"
 app_config_serviceid = "serviceid"
+app_config_latitude = "latitude"
+app_config_longitude = "longitude"
 app_config_config_file = "config_file"
 app_config_algorithms = "algorithms"
 app_config_sensors = "sensors"
-app_config_place_id = "place_id"
 
 '''
 Below are the keys in the json that we get to serve a service
@@ -42,24 +40,7 @@ Below are the keys in the json that we get to serve a service
 
 app = Flask(__name__)
 
-def get_location_from_place_id(place_id):
-
-	cluster = MongoClient(dburl)
-	db = cluster[db_name]
-	collection = db[place_details_collection]
-	result = collection_to_json(collection)
-	result = json.loads(result)
-	latitude = 0
-	longitude = 0
-	for row in result:
-		if(row['place_id'] == place_id):
-			latitude = row['lat']
-			longitude = row['long']
-			print("Got long and lat of place_id : ",place_id)
-	return latitude, longitude
-
 def check_field_in_json(data,field):
-
 	if(field in data): 
 		return True
 	else: 
@@ -109,6 +90,7 @@ def do_logging(serviceid, state=stop_command, applicationname=None, temptopic=No
 				msg = "Multiple occurences of service with serviceid "+serviceid+" found!, closing all."
 
 		for x in collection.find():
+			print(x)
 			if ( (x["serviceid"]) == serviceid ):
 				temptopic = x["temptopic"]
 				process_id = x["process_id"]
@@ -133,7 +115,7 @@ def do_logging(serviceid, state=stop_command, applicationname=None, temptopic=No
 		count = service_count(serviceid,collection)
 
 		if (count>0):
-			print("Another service with same id received. Restarting it with new details.")
+			print("Kya re divyansh, do service same name? ")
 			msg = "Service with serviceid "+serviceid+" was already running, closing previous and restarting this."
 			do_logging(serviceid, restart_command, applicationname, temptopic, sensor_topic_id_name_list_for_all_sensors, process_id)
 			return msg
@@ -161,7 +143,6 @@ def do_logging(serviceid, state=stop_command, applicationname=None, temptopic=No
 	return msg
 
 def restart_services():
-
 	cluster = MongoClient(dburl)
 	db = cluster[db_name]
 	collection = db[logging_collection]
@@ -182,7 +163,6 @@ def stop_service(serviceid):
 	return do_logging(serviceid, stop_command)
 
 def clear_logs():
-
 	cluster = MongoClient(dburl)
 	db = cluster[db_name]
 	collection = db[logging_collection]
@@ -190,7 +170,6 @@ def clear_logs():
 	return
 
 def get_sensor_types_list_in_service(d, servicename, applicationName):
-
 	not_correct_list = []
 	if(check_field_in_json(d,applicationName)==False):
 		return False, None, "Application named "+applicationName+" not present in the config_file."
@@ -203,7 +182,6 @@ def get_sensor_types_list_in_service(d, servicename, applicationName):
 	required_sensor_types_list = []
 
 	found_service_required_in_config = False
-
 	for service in list_of_services:
 		if service == servicename:
 			found_service_required_in_config = True
@@ -215,56 +193,36 @@ def get_sensor_types_list_in_service(d, servicename, applicationName):
 
 	sensor_keys = list_of_sensors_with_key.keys()
 	for key in sensor_keys:
-		required_sensor_types_list.append(list_of_sensors_with_key[key]) 
+		required_sensor_types_list.append(list_of_sensors_with_key[key])
 
 	return True, required_sensor_types_list, "OK"
 
-def get_sensor_topic(query, place_id, latitude, longitude):
-
-	# query {"sensor_type" : "xx", "all_sensors" : "yes/no"}
-	
+def get_sensor_topic(query, latitude, longitude):
 	cluster = MongoClient(dburl)
 	db = cluster[db_name]
 	col = db[collection_name]
 	sensor_topic_id_name_list = []
 	sensor_instances_not_registered_list = []
 	got_nearest_sensors = True
-
-	for sensor_num in range(len(query)): 
-		
+	for sensor_num in range(len(query)):
 		docs = col.find({})
 		min_dist = sys.maxsize
 		sensor_topic_id_name = None
-
-		if query[sensor_num]['all_sensors'] == 'yes':
-			for i in docs:
-				if i['sensor_name'] == query[sensor_num]['sensor_type']:
+		for i in docs:
+			if i['sensor_name'] == query[sensor_num]:
+				temp_lat = int(i['sensor_geolocation']['lat'])
+				temp_long = int(i['sensor_geolocation']['long'])
+				latitude = int(latitude)
+				longitude = int(longitude)
+				if (abs(temp_lat - latitude)+abs(temp_long - longitude)) < min_dist:
+					min_dist = abs(temp_lat - latitude) + abs(temp_long-longitude)
 					sensor_topic_id_name = i['sensor_data_storage_details']['kafka']['broker_ip'] + "#" + i['sensor_data_storage_details']['kafka']['topic'] + "#" + i['sensor_id'] + "#" + i['sensor_name']
-					sensor_topic_id_name_list.append(sensor_topic_id_name)
+					print("sensor_topic_id_name : ",sensor_topic_id_name)
 
-			if(sensor_topic_id_name == None):
-				got_nearest_sensors = False
-				sensor_instances_not_registered_list.append(query[sensor_num])	
-		else:
-			for i in docs:
-				if i['sensor_name'] == query[sensor_num]['sensor_type']:
-					temp_lat = int(i['sensor_geolocation']['lat'])
-					temp_long = int(i['sensor_geolocation']['long'])
-					temp_place_id = i['place_id']
-					latitude = int(latitude)
-					longitude = int(longitude)
-					if(temp_place_id==place_id):
-						sensor_topic_id_name = i['sensor_data_storage_details']['kafka']['broker_ip'] + "#" + i['sensor_data_storage_details']['kafka']['topic'] + "#" + i['sensor_id'] + "#" + i['sensor_name']
-						break
-					elif(abs(temp_lat - latitude)+abs(temp_long - longitude)) < min_dist:
-						min_dist = abs(temp_lat - latitude) + abs(temp_long-longitude)
-						sensor_topic_id_name = i['sensor_data_storage_details']['kafka']['broker_ip'] + "#" + i['sensor_data_storage_details']['kafka']['topic'] + "#" + i['sensor_id'] + "#" + i['sensor_name']
-
-		# print("sensor_topic_id_name : ",sensor_topic_id_name)
-			if(sensor_topic_id_name == None):
-				got_nearest_sensors = False
-				sensor_instances_not_registered_list.append(query[sensor_num])
-			sensor_topic_id_name_list.append(sensor_topic_id_name)
+		if(sensor_topic_id_name == None):
+			got_nearest_sensors = False
+			sensor_instances_not_registered_list.append(query[sensor_num])
+		sensor_topic_id_name_list.append(sensor_topic_id_name)
 
 	return got_nearest_sensors, sensor_topic_id_name_list, sensor_instances_not_registered_list
 
@@ -290,9 +248,9 @@ def dump_data(ip, topic, serviceid, temptopic, sensor_id, sensor_name):
 		time.sleep(int(data_rate))
 
 def listen_action_manager():
-	consumer = KafkaConsumer(str(action_manager_topic), bootstrap_servers=[KAFKA_PLATFORM_IP], auto_offset_reset = "earliest")
+	consumer = KafkaConsumer(str(action_manager_topic), bootstrap_servers=[KAFKA_PLATFORM_IP], auto_offset_reset = "earliest",group_id=smgid)
 	for message in consumer:
-		print("Take below Action on controller : ")
+		print("Take below Action : ")
 		value = message.value.decode('utf-8')
 		print(value)
 
@@ -322,7 +280,7 @@ def bind_sensor_data_to_temptopic(sensor_topic_id_name_list_for_all_sensors, ser
 
 	consumer.subscribe(list_of_topics)
 	consumer.poll()
-	# print("after poll.")
+	print("after poll.")
 	producer = KafkaProducer(bootstrap_servers=[KAFKA_PLATFORM_IP],value_serializer=json_serializer)
 
 	for message in consumer:
@@ -357,7 +315,7 @@ def parse_request_sensor_manager(data):
 	not_correct_list = []
 	values = []
 	correctly_parsed_outer_json = True
-	app_config_field_list = [app_config_username, app_config_applicationname, app_config_servicename, app_config_serviceid, app_config_place_id, app_config_config_file]
+	app_config_field_list = [app_config_username, app_config_applicationname, app_config_servicename, app_config_serviceid,  app_config_config_file]
 	
 	for field in app_config_field_list:
 		if(check_field_in_json(data_dict,field)):
@@ -367,4 +325,6 @@ def parse_request_sensor_manager(data):
 			values.append(None)
 			correctly_parsed_outer_json = False
 
-	return correctly_parsed_outer_json, values[0], values[1], values[2], values[3], values[4], values[5], not_correct_list
+	return correctly_parsed_outer_json, values[0], values[1], values[2], values[3], values[4], not_correct_list
+
+

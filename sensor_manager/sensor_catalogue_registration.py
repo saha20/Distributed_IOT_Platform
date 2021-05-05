@@ -4,7 +4,7 @@ from sensor_package import *
 
 app = Flask(__name__)
 appport = catalogue_reg_port
-collection_name = "sensor_catalogue"
+collection_name = sensor_catalogue_collection
 
 def remove_unnecessary_data(data):
     
@@ -42,7 +42,7 @@ def fun2():
         return msg
     user_id = incoming_data["user_id"]
     config = incoming_data["sensor_catalogue_config"]
-    config = remove_unnecessary_data(config)
+    # config = remove_unnecessary_data(config)
 
     cluster = MongoClient(dburl)
     db = cluster[db_name]

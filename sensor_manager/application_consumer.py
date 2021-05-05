@@ -25,7 +25,7 @@ def json_deserializer(msg):
 
 if __name__ == '__main__':
 	
-	producer_topic = "sensor_topic_15"
+	producer_topic = input("Enter topic name : ")
 	consumer = KafkaConsumer(producer_topic, bootstrap_servers=[KAFKA_PLATFORM_IP], auto_offset_reset = "latest", group_id=smgid)
 	for msg in consumer:
 		print(json.loads(msg.value))

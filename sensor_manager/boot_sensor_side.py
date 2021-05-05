@@ -82,7 +82,7 @@ if __name__ == '__main__':
 	# print("Enter exit() command to stop.")
 	# threading.Thread(target=listen_exit).start()
 
-	file_names = ["sensor_catalogue_registration.py","sensor_instance_registation.py","start_sensors.py","sensor_manager.py"]
+	file_names = ["sensor_catalogue_registration.py","sensor_instance_registation.py","start_sensor_covid_app.py","start_sensor_manuf.py","sensor_manager.py"]
 	
 	for fname in file_names:
 		target_file = os.path.join(folder,fname)
