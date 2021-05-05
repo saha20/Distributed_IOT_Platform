@@ -1,6 +1,6 @@
 import os.path
 from os import path
-from kafka import KafkaProducer , KafkaConsumer
+# from kafka import KafkaProducer , KafkaConsumer
 import zipfile
 import requests as rq
 import json , time
@@ -14,7 +14,7 @@ app_repo_ip = 'app_repo'
 app_repo_port = 7007
 app = Flask(__name__)
 
-#TODO: create requirement.txt by parsing config
+ui_url = 'http://ui:5959/transferFolder'
 
 def validateJSON(jsonData):
 	try:
@@ -90,6 +90,9 @@ def sendAppToMachine():
 	#copy all code files from given service directory to container
 	for files in listdir(files_path):
 		ftp_conn.put(files_path+files, './' + service_id+'/'+files)
+
+	# place service_heartbeat file
+	ftp_conn.put('./service_heartbeat.py', './' + service_id+'/service_heartbeat.py')
 	
 	# ftp_conn.close()
 	print('done with ssh')
@@ -118,16 +121,21 @@ def heartBeat():
 
 
 
-
-
-
+def get_files_from_UI():
+	req = {
+		'action' : 'send_files'
+	}
+	res = rq.post(url = ui_url, json = req)
+	
+	
 # def initiateAppRepo():
 # 	app.run(host=socket.gethostbyname(socket.gethostname()), port=app_repo_port, debug=False, threaded=True)
 
 
 if __name__ == "__main__":
-	thread1 = threading.Thread(target = heartBeat)
-	thread1.start()
+	# thread1 = threading.Thread(target = heartBeat)
+	# thread1.start()
+	get_files_from_UI()
 	app.run(host= '0.0.0.0', port=app_repo_port, debug=False)
 	# app.run(host=socket.gethostbyname(socket.gethostname()), port=app_repo_port, debug=False)
 	# t1 = threading.Thread(target=initiateAppRepo)
