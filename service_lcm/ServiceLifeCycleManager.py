@@ -14,8 +14,9 @@ service_lm_port = 8089
 services_dict = {}
 deployer_service_url = 'http://deployer:5001'
 
-cluster = MongoClient('mongodb://deployer_user:deployer@cluster0-shard-00-00.houot.mongodb.net:27017,cluster0-shard-00-01.houot.mongodb.net:27017,cluster0-shard-00-02.houot.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-frer5y-shard-0&authSource=admin&retryWrites=true&w=majority')
-db = cluster['deployer_db']
+# cluster = MongoClient('mongodb://deployer_user:deployer@cluster0-shard-00-00.houot.mongodb.net:27017,cluster0-shard-00-01.houot.mongodb.net:27017,cluster0-shard-00-02.houot.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-frer5y-shard-0&authSource=admin&retryWrites=true&w=majority')
+cluster = MongoClient('mongodb://apurva:user123@cluster0-shard-00-00.p4xv2.mongodb.net:27017,cluster0-shard-00-01.p4xv2.mongodb.net:27017,cluster0-shard-00-02.p4xv2.mongodb.net:27017/IAS_test_1?ssl=true&replicaSet=atlas-auz41v-shard-0&authSource=admin&retryWrites=true&w=majority')
+db = cluster['IAS_test_1']
 collection = db['deployer_logs']
 
 
@@ -33,7 +34,7 @@ def heartBeat():
 	while True:
 		t = time.localtime()
 		current_time = int (time.strftime("%H%M%S", t))
-		data = {"module" : "deployer" , "ts" : current_time , "Status" : 1   }
+		data = {"module" : "service_lcm" , "ts" : current_time , "Status" : 1   }
 		producer.send("HeartBeat", data)
 		producer.flush()
 		time.sleep(3)
