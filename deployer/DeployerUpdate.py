@@ -24,9 +24,9 @@ from pymongo import MongoClient
 #appRep 
 appRepo_url = 'http://app_repo:7007'
 #load balancer ip port 
-lb_url = 'http://load_balancer:5555'
+lb_url = 'http://load_balancer:55555'
 #sensor manager url
-sm_url = "http://sensor_manager:5012"
+sm_url = "http://sensor_manager:5050"
 #scheduler url TODO: ask port
 sch_url = "http://scheduler:13337"
 
@@ -69,7 +69,7 @@ def informSensorManager(service_id):
 def informScheduler(service_id):
 	req = {}
 	req['service_id'] = service_id
-	rsp = rq.post(sch_url+'/stopService', json = req)
+	rsp = rq.post(sch_url+'/aborted_service', json = req)
 	print("returned from sensor manager")
  
 def stopService(pid,node_ip,machineName,machinePassword):
