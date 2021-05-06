@@ -109,11 +109,13 @@ def deployeActual(machineName, machinePassword, node_ip, app_id, service_name, s
 			for pack in req:
 				ssh_client.exec_command('pip3 install '+pack)
 
-
+	#json filename
+	json_filename = str(service_id)+'.json'
+	
 	#run service script file
 	filepath = './'+service_id+'/'+service_file
 	print("running file", filepath)
-	stdin,stdout,stderr=ssh_client.exec_command('python3 '+filepath+' '+temp_topic+' '+output_topic+' '+service_id)
+	stdin,stdout,stderr=ssh_client.exec_command('python3 '+filepath+' '+temp_topic+' '+output_topic+' '+service_id+' '+json_filename)
 	# stdin,stdout,stderr=ssh_client.exec_command('echo root | python3 -u '+filepath)
 	# print(stdout.readlines())
 	# print(stderr.readlines())
@@ -127,7 +129,7 @@ def deployeActual(machineName, machinePassword, node_ip, app_id, service_name, s
 
 
 
-def SendFullRepo(machineName, machinePassword, machineIp, app_id, serviceName, service_id):
+def SendFullRepo(machineName, machinePassword, machineIp, app_id, serviceName, service_id, action_details):
 	req = {}
 	req['machineName'] 		= machineName
 	req['machinePassword']  = machinePassword
@@ -135,6 +137,7 @@ def SendFullRepo(machineName, machinePassword, machineIp, app_id, serviceName, s
 	req['app_id']			= app_id
 	req['serviceName'] 		= serviceName
 	req['service_id'] 		= service_id
+	req['action_details']   = action_details
 	# req['sensor_topic']		= sensor_topics
 	# req['output_topic']		= 'action_service_topic'
 	res = rq.post(url = appRepo_url+'/send_files_machine', json = req)
@@ -282,7 +285,7 @@ def restartDeployer():
 
 		if(int(state) < 5):
 			print("failed at 5")
-			status = SendFullRepo(machineName, machinePassword, container_name, app_id, service_name, service_id)
+			status = SendFullRepo(machineName, machinePassword, container_name, app_id, service_name, service_id, action_details)
 			collection.update_one({'service_id': service_id}, {'$set' : {'state':'5'}})
 		print("success till 5")
 

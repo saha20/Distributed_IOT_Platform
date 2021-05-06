@@ -16,6 +16,10 @@ app = Flask(__name__)
 
 ui_url = 'http://ui:5959/transferFolder'
 
+dburl = "mongodb://apurva:user123@cluster0-shard-00-00.p4xv2.mongodb.net:27017,cluster0-shard-00-01.p4xv2.mongodb.net:27017,cluster0-shard-00-02.p4xv2.mongodb.net:27017/IAS_test_1?ssl=true&replicaSet=atlas-auz41v-shard-0&authSource=admin&retryWrites=true&w=majority"
+db_name = "IAS_test_1"
+collection_name = "test_zip_file_upload"
+
 def validateJSON(jsonData):
 	try:
 		json.loads(jsonData)
@@ -72,7 +76,17 @@ def sendAppToMachine():
 	app_id = req['app_id']
 	service_name = req['serviceName']
 	service_id = req['service_id']
+	action_details = req['action_details']
 	print('extracted values from deployer')
+
+	#create action json file
+	json_filename = str(service_id) + '.json'
+	with open('./helpers/'+json_filename, 'w') as outfile:
+    	json.dump(action_details, outfile)
+
+    #download files from mongodb
+    
+
 	
 	#ssh to client
 	ssh_client = paramiko.SSHClient()
@@ -92,7 +106,13 @@ def sendAppToMachine():
 		ftp_conn.put(files_path+files, './' + service_id+'/'+files)
 
 	# place service_heartbeat file
-	ftp_conn.put('./service_heartbeat.py', './' + service_id+'/service_heartbeat.py')
+	ftp_conn.put('./helpers/service_heartbeat.py', './' + service_id+'/service_heartbeat.py')
+
+	#place json file
+	ftp_conn.put('./helpers/'+json_filename, './' + service_id+'/'+json_filename)
+
+	#place read_sensor_info file
+	ftp_conn.put('./helpers/read_sensor_info.py', './' + service_id+'/read_sensor_info.py')
 	
 	# ftp_conn.close()
 	print('done with ssh')
@@ -121,11 +141,7 @@ def heartBeat():
 
 
 
-def get_files_from_UI():
-	req = {
-		'action' : 'send_files'
-	}
-	res = rq.post(url = ui_url, json = req)
+
 	
 	
 # def initiateAppRepo():
@@ -135,7 +151,6 @@ def get_files_from_UI():
 if __name__ == "__main__":
 	thread1 = threading.Thread(target = heartBeat)
 	thread1.start()
-	# get_files_from_UI()
 	app.run(host= '0.0.0.0', port=app_repo_port, debug=False)
 	# app.run(host=socket.gethostbyname(socket.gethostname()), port=app_repo_port, debug=False)
 	# t1 = threading.Thread(target=initiateAppRepo)

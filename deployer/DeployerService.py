@@ -78,7 +78,7 @@ def startDeployment():
 	output_topic = 'action_service_topic'
 	 
 	# send request to app repo to copy code files at machine
-	status = dh.SendFullRepo(machine_name, machinePassword, container_name, app_id, service_name, service_id)
+	status = dh.SendFullRepo(machine_name, machinePassword, container_name, app_id, service_name, service_id, action_details)
 	print("Status of ssh - --------------->", status.json()['status'])
 	collection.update_one({'service_id': service_id}, {'$set' : {'state':'5'}})
 	#State 5 Completed
