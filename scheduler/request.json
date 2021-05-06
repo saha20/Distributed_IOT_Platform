@@ -15,7 +15,7 @@
                 "action" : {
                     "user_display" : "Results",
                     "sensor_manager" : [{"sensor_id1" : "command1"}],
-                    "notify_user" : {}
+                    "notify_user" : []
                 },
                 "place_id" : "GGG_ground_floor_1"
             }
