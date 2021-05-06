@@ -7,8 +7,8 @@ import threading
 import sys
 import math
 import json
-KAFKA_PLATFORM_IP = 'localhost:9092'
-# KAFKA_PLATFORM_IP = 'kafka:9092'
+# KAFKA_PLATFORM_IP = 'localhost:9092'
+KAFKA_PLATFORM_IP = 'kafka:9092'
 # RPC file to read sensor info
 # read_sensor_info
 
