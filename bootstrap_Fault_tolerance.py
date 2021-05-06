@@ -13,6 +13,7 @@ collection_names = [
 	]
 	
 modules_to_bootstrap = [ 
+	'app_ui',
 	'app_repo' , 
 	'scheduler' , 
 	'service_lcm',
@@ -154,6 +155,8 @@ def up_machine(module_name):
 			ports = [13337]
 		elif module_name == 'sensor_manager':
 			ports = [7071 , 7072 , 5050]
+		elif module_name == 'app_ui':
+			ports = [5001]
 		elif module_name == 'load_balancer':
 			ports = [55555]
 		elif module_name == 'service_lcm':

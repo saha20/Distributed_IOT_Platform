@@ -1,0 +1,7 @@
+Stop all docker 
+ docker stop $(docker ps -aq)
+
+
+
+Remove all docker
+ docker rm $(docker ps -aq)
