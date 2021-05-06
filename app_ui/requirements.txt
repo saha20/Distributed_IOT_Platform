@@ -4,6 +4,6 @@ Flask-Bcrypt==0.7.1
 Flask-SQLAlchemy>=2.5
 Flask-Login==0.4.0
 psycopg2==2.7.1
-Werkzeug==0.15.3
+Werkzeug==0.14.1
 requests
 pymongo

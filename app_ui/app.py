@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from flask import Flask, render_template, request, redirect, url_for, flash, session, send_file, jsonify
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
@@ -411,5 +413,5 @@ if __name__ == "__main__":
 	# change to app.run(host="0.0.0.0"), if you want other machines to be able to reach the webserver.
     # db.create_all()
     # call apurva's api and 
-    app.run(port=5001, threaded=True, host=('0.0.0.0'))
+    app.run(port=5001, threaded=True, host='0.0.0.0')
     # app.run(host="localhost",port=5005)
