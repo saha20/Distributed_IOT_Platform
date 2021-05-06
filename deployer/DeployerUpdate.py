@@ -203,7 +203,7 @@ def requestLoadBalancer(user_id, app_id, service_name, service_id):
 
 	lb_response = rq.post(lb_url+'/return_host', json = "")
 	lb_response = lb_response.json()
-	node_ip = lb_response['ip']
+	node_ip = lb_response['machine_name']
 	# node_port = lb_response['port']
 	print("Got Load balancer ip port")
 
