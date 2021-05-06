@@ -189,6 +189,7 @@ def restartServices():
 def listenForInstruction():
     # check restart
     restartServices()
+    print("hello from AM")
     # listen_data = consume
     consumer = KafkaConsumer('action_manager',
      bootstrap_servers = ['kafka:9092'],
