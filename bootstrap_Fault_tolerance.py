@@ -9,7 +9,7 @@ collection_names = [
 	"ServiceInformation" , 
 	"deployer_logs",
 	"host_log",
-	"logger_current",
+	"sensor_manager_logger_current",
 	"action_manager_log"
 	]
 	
