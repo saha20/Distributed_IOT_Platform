@@ -139,10 +139,14 @@
                                        placeholder="Phone No." value="">
                             </div>
 
-                            
                             <div class="form-group">
-                                <label>Enter Latitude & Longitude</label>
-                                <textarea class="form-control" rows="3" placeholder="23.45:45.45,23.45:45.45" name="location" id="location"></textarea>
+                                <label>Select Place ID</label>
+                                <select class="form-control"  name="location" id="location">
+                                    <option value="defaut">default</option>
+                                    {% for x in place_id %}
+                                        <option value="{{x}}">{{x}}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
                             
                             <button type="submit" class="btn btn-default">Schedule</button>
