@@ -2,4 +2,6 @@ flask
 requests
 paramiko
 kafka-python
+pymongo
+
 
