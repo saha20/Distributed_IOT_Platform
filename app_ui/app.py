@@ -1,11 +1,16 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, send_file
+from flask import Flask, render_template, request, redirect, url_for, flash, session, send_file, jsonify
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from models.Users import User
 from models.Users import db
-import requests, json
+from gridfs import GridFS
+from bson.binary import Binary
+from pymongo import MongoClient
+from bson.objectid import ObjectId
+import requests, json, zipfile
 import re
 import os
+from bson.json_util import dumps, loads
 
 # setup the app
 app = Flask(__name__)
@@ -15,6 +20,11 @@ app.config['DEBUG'] = True
 app.config['SECRET_KEY'] = "SuperSecretKey"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+
+db_url = "mongodb://apurva:user123@cluster0-shard-00-00.p4xv2.mongodb.net:27017,cluster0-shard-00-01.p4xv2.mongodb.net:27017,cluster0-shard-00-02.p4xv2.mongodb.net:27017/IAS_test_1?ssl=true&replicaSet=atlas-auz41v-shard-0&authSource=admin&retryWrites=true&w=majority"
+db_name = "IAS_test_1"
+collection_name = "test_zip_file_upload"
+# file_name = "./Final.zip"
 
 db.init_app(app)
 bcrypt = Bcrypt(app)
@@ -152,10 +162,31 @@ def bootstrap_elements():
 def bootstrap_grid():
     return render_template('bootstrap-grid.html', user=current_user)
 
+def collection_to_json(col):
+	cursor = col.find()
+	list_cur = list(cursor)
+	json_data = dumps(list_cur)
+	return json_data
+
+def fetch_place_id():
+    place_details_collection = "place_collection"
+    cluster = MongoClient(db_url)
+    db = cluster[db_name]
+    collection = db[place_details_collection]
+    result = collection_to_json(collection)
+    result = json.loads(result)
+    place_id_list = []
+    for row in result:
+        place_id_list.append(row['place_id'])
+    place_id_list.append("default")
+
+    print(place_id_list)
+    return place_id_list
 
 @app.route('/schedule-application')
 def blank_page():
-    return render_template('schedule-application.html', user=current_user)
+    place_id_list = fetch_place_id()
+    return render_template('schedule-application.html', user=current_user, place_id=place_id_list)
 
 
 @app.route('/profile')
@@ -187,7 +218,7 @@ def scheduling_request_upload():
 
     with open(fpath, "r") as f:
         data = json.loads(f.read())
-    requests.post('http://127.0.0.1:13337/schedule_request',json=data)
+    requests.post('http://scheduler:13337/schedule_request',json=data)
 
     return render_template('index.html', user=current_user)
 
@@ -195,6 +226,7 @@ def scheduling_request_upload():
 @login_required
 def scheduling_request():
     application_name = str(request.form['application_name'])
+    location = str(request.form['location'])
 
     startTimes = request.form['startTime'].split(',')
     durations = request.form['duration'].split(',')
@@ -202,7 +234,6 @@ def scheduling_request():
     message = request.form['message']
 
     isScheduled = request.form['isScheduled']
-    locations = request.form['location'].split(',')
 
     if(isScheduled == False):
         startTimes = None
@@ -252,26 +283,80 @@ def scheduling_request():
                         "sensor_manager" : [{"sensor_id1" : "command1"}],
                         "notify_user" : [email,mobile]
                     },
-                    "location": locations
+                    "place_id": location
                     }
                 }
             }
         }
 
-    print(data)
-
-    requests.post('http://127.0.0.1:13337/schedule_request',json=data)
+    requests.post('http://scheduler:13337/schedule_request',json=data)
     return render_template('index.html', user=current_user)
+
+def validateJSON(jsonData):
+    try:
+        json.loads(jsonData)
+    except ValueError as err:
+        return False
+    return True
+
+def check_format(uploaded_file, app_path, app_name, file_path):
+    with zipfile.ZipFile(file_path, 'r') as zip_ref:
+        zip_ref.extractall(app_path)
+    
+    # check src file, exists or not.
+    src_path = app_path+"/"+app_name+"/src"
+    if not os.path.exists(src_path):
+        return jsonify({"status" : "src folder missing"})
+
+
+    # check app_config.
+    config_filepath = app_path+"/"+app_name + "/app_config.json"
+    if not os.path.exists(config_filepath):
+        return jsonify({"status" : "app_config.json missing"})
+    
+    # validate json
+    if not validateJSON(config_filepath):
+        return jsonify({"status" : "Invalid JSON file"})
+    
+    return True
+    
+def create_connection_mongo_cloud():
+    cluster = MongoClient(db_url)
+    db = cluster[db_name]
+    coll = db[collection_name]
+    db2 = cluster.gridfs_example
+    fs = GridFS(db2)
+    return fs, coll
 
 @app.route('/uploads/', methods=["POST"])
 @login_required
 def upload_file():
-    uploaded_file = request.files['file']
-    if uploaded_file.filename != '':
-        # uploaded_file.save(os.path.join('static/uploads/', current_user.get_id()))
-        uploaded_file.save(os.path.join('static/uploads/', uploaded_file.filename))
-    return redirect(url_for('forms'))
 
+    uploaded_file = request.files['file']
+    app_path = "./static/uploads/"
+    app_name = uploaded_file.filename
+
+    if uploaded_file.filename != '':
+        file_path = os.path.join(app_path, app_name)
+        uploaded_file.save(file_path)
+    
+    format_status = check_format(uploaded_file, app_path, app_name, file_path)
+    if format_status == True:
+        pass
+    else:
+        return format_status
+
+    fs, coll = create_connection_mongo_cloud()
+
+    with open(file_path, "rb") as fp:
+        encoded = Binary(fp.read())
+    flink = fs.put(encoded, filename = app_name)
+
+    coll.insert_one({"filename": app_name, "file": flink })
+
+    os.remove(file_path)
+
+    return json.dumps({'status': 'Zip uploaded successfully'}), 200
 
 ####  end routes  ####
 
@@ -325,4 +410,6 @@ def password_check(password):
 if __name__ == "__main__":
 	# change to app.run(host="0.0.0.0"), if you want other machines to be able to reach the webserver.
     # db.create_all()
-    app.run(host="localhost",port=5005) 
+    # call apurva's api and 
+    app.run(port=5001, threaded=True, host=('0.0.0.0'))
+    # app.run(host="localhost",port=5005)
