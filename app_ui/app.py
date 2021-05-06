@@ -191,10 +191,25 @@ def fetch_place_id():
     print(place_id_list)
     return place_id_list
 
+def fetch_applications():
+    application_details_collection = "test_zip_file_upload"
+    cluster = MongoClient(db_url)
+    db = cluster[db_name]
+    collection = db[application_details_collection]
+    result = collection_to_json(collection)
+    result = json.loads(result)
+    application_list = []
+    for row in result:
+        fname = row['filename']
+        fname = fname[:-4]
+        application_list.append(fname)
+    return application_list
+
 @app.route('/schedule-application')
 def blank_page():
     place_id_list = fetch_place_id()
-    return render_template('schedule-application.html', user=current_user, place_id=place_id_list)
+    application = fetch_applications()
+    return render_template('schedule-application.html', user=current_user, place_id=place_id_list, applications = application)
 
 
 @app.route('/profile')

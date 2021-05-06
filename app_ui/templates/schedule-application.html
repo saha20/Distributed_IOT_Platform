@@ -32,24 +32,30 @@
 
                                 <div class="form-group">
                                     <label>Select Application</label>
-                                    <select class="form-control" name="application_name" id="app_name">
+                                    <!-- <select class="form-control" name="application_name" id="app_name">
                                         <option value="Application1">Application 1</option>
                                         <option value="Application2">Application 2</option>
                                         <option value="Application3">Application 3</option>
                                         <option value="Application4">Application 4</option>
                                         <option value="Application5">Application 5</option>
+                                    </select> -->
+
+                                    <select class="form-control"  name="application_name" id="app_name">
+                                        {% for x in applications %}
+                                            <option value="{{x}}">{{x}}</option>
+                                        {% endfor %}
                                     </select>
                                 </div>
 
                                 <div class="form-group">
                                     <label>Select Algorithms/Service</label>
                                     <select class="form-control" name="algorithms" id="algorithms">
-                                        <option value="Algorithm1">Algorithm 1</option>
-                                        <option value="Algorithm2">Algorithm 2</option>
-                                        <option value="Algorithm3">Algorithm 3</option>
-                                        <option value="Algorithm4">Algorithm 4</option>
-                                        <option value="Algorithm5">Algorithm 5</option>
+                                        <option value="algo1">algo1</option>
+                                        <option value="algo2">algo2</option>
+                                        <option value="algo3">algo3</option>
                                     </select>
+
+                                    
                                 </div>
 
 
