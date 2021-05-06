@@ -119,7 +119,7 @@ def sendAppToMachine():
 
 	#download files from mongodb in repository folder
 	application_filename = app_id+'.zip'
-	# get_files_to_local(application_filename)
+	get_files_to_local(application_filename)
 
 	
 	#ssh to client
