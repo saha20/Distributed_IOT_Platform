@@ -13,10 +13,16 @@ import requests, json, zipfile
 import re
 import os
 from bson.json_util import dumps, loads
+import sensorCatalogueRegistration as sensorFunc
+import sensorInstanceRegistation as sensorInstanceFunc
+
+address_dict = {"Lapataganj" : { "lat" :"167","long" :"196"}}
+building_dict = {"Lapataganj" : ["Gorisaria and grandsons Garments Group"]}
 
 # setup the app
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = os.path.dirname(os.path.realpath(__file__)) + "/static/uploads"
+app.config['DOWNLOAD_FOLDER'] = os.path.dirname(os.path.realpath(__file__)) + "/static/downloads"
 app.config["ALLOWED_EXTENSIONS"] = ["zip"]
 app.config['DEBUG'] = True
 app.config['SECRET_KEY'] = "SuperSecretKey"
@@ -203,9 +209,9 @@ def settings():
 @app.route('/download', methods=["GET","POST"])
 @login_required
 def download():
-    # Appending app path to upload folder path within app root folder
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'],filename)
     filename = "template.json"
+    # Appending app path to upload folder path within app root folder
+    filepath = os.path.join(app.config['DOWNLOAD_FOLDER'],filename)
     # Returning file from appended path
     return send_file(filepath, as_attachment=True)
 
@@ -223,6 +229,20 @@ def scheduling_request_upload():
     requests.post('http://scheduler:13337/schedule_request',json=data)
 
     return render_template('index.html', user=current_user)
+
+def correct_email(email):
+    regex = '^(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}$'
+    if(re.search(regex, email)):
+        return True
+    else:
+        return False
+
+def correct_phone(phone):
+    regex = '^[0-9]{10}$'
+    if(re.search(regex,phone)):
+        return True
+    else:
+        return False    
 
 @app.route('/scheduling_request/', methods=["POST"])
 @login_required
@@ -244,8 +264,21 @@ def scheduling_request():
     # durationDummy = "01:01:10,00:02:15"
     # locationDummy = "23.45:32.21,54.12:32"
 
-    email = request.form['email']
-    mobile = request.form['mobile']
+    email = request.form['email'].split(',')
+    mobile = request.form['mobile'].split(',')
+    notify_user = list()
+    for item in email:
+        if correct_email(item):
+            notify_user.append(item)
+        else:
+            return jsonify({"status" : "re-enter email id"})
+    for item in mobile:
+        if correct_phone(item):
+            notify_user.append(item)
+        else:
+            return jsonify({"status" : "re-enter phone no."})
+
+    # print(notify_user)
 
     days = list()
     
@@ -283,7 +316,7 @@ def scheduling_request():
                     "action" : {
                         "user_display" : message,
                         "sensor_manager" : [{"sensor_id1" : "command1"}],
-                        "notify_user" : [email,mobile]
+                        "notify_user" : notify_user
                     },
                     "place_id": location
                     }
@@ -407,6 +440,113 @@ def password_check(password):
     }
 
     return ret
+
+@app.route('/sensor-catalogue-registration', methods=["GET","POST"])
+def sensor_catalogue_registration():
+    return render_template('sensor-catalogue-registration.html', user=current_user)
+
+@app.route('/sensor-registration')
+def sensor_instance_registration():
+    floorList = ["ground_floor","first_floor"]
+    roomList = ["1","2","3","4","5"]
+    sensorInfo = sensorInstanceFunc.fun1()
+    # print('sensorInfo type - ',type(sensorInfo))
+    sensorInfo = json.loads(sensorInfo)
+    # print('sensorInfo type - ',type(sensorInfo))
+    sensorList = []
+    for s in sensorInfo:
+        # print(type(s))
+        sensorList.append(s['sensor_name'])
+    print('Sensor List - ',sensorList)
+    print('adrres List - ',address_dict.keys())
+    return render_template('sensor_registration.html', user=current_user, data = sensorList, area=address_dict.keys(), building = building_dict['Lapataganj'], floors = floorList, rooms = roomList)
+
+@app.route('/addSensorType',methods=["GET","POST"])
+def fun():
+    print('Entered Add Sensor Type')
+
+def get_json_template():
+    sensor_info = {}
+    sensor_info["user_id"]="None"
+    sensor_catalogue_config = {}
+    kafka_dict = {}
+    kafka_dict['broker_ip'] = "None"
+    kafka_dict['topic'] = "None"
+    mongodb_dict = {}
+    mongodb_dict['ip'] = "None"
+    mongodb_dict['port'] = "None"
+    mongodb_dict['passwd'] = "None"
+    mongodb_dict['document_name'] = "None"
+    temp_dict = {}
+    temp_dict['kafka'] = kafka_dict
+    temp_dict['mongo_db'] = mongodb_dict
+    address_dict = {}
+    address_dict['area'] = "None"
+    address_dict['building'] = "None"
+    address_dict['floor'] = "None"
+    address_dict['room_no'] = "None"
+    sensor_catalogue_config["sensor_name"] = "None"
+    sensor_catalogue_config["sensor_type"] = "None"
+    sensor_catalogue_config['sensor_geolocation'] = {"lat" : "None", "long" : "None" }
+    sensor_catalogue_config['sensor_address'] = address_dict
+    sensor_catalogue_config['sensor_data_storage_details'] = temp_dict
+    sensor_catalogue_config['sensor_api'] = "None"
+    sensor_info['sensor_catalogue_config'] = sensor_catalogue_config
+    return sensor_info
+
+
+@app.route('/catalogue_registeration_request/',methods=["GET","POST"])
+@login_required
+def catalogue_registeration_request():
+    sensor_name = request.form['sensor_name']
+    sensor_type =  request.form['sensor_type']
+    print("SensorName = ",sensor_name)
+    print("SensorType = ",sensor_type)
+    sensor_info = {}
+    user = ""
+    sensor_info = get_json_template()
+    sensor_info["user_id"]=current_user.username
+    sensor_info["sensor_catalogue_config"]["sensor_name"] = sensor_name
+    sensor_info["sensor_catalogue_config"]["sensor_type"] = sensor_type
+    filepath = 'static/uploads/'+'sensor_catalogue_registration.json'
+    with open(filepath,'w') as f:
+        json.dump(sensor_info,f)
+
+    results= sensorFunc.fun2(sensor_info)
+    # requests.post('http://127.0.0.1:5005/sensorCatalogueRegistration/addSensorType',json=sensor_info)
+    return render_template('index.html', user=current_user)
+
+
+@app.route("/sensorsSelect" , methods=['GET', 'POST'])
+def test():
+    select_sensor = request.form.get('comp_select')
+    select_area = request.form.get('area_select')
+    select_building = request.form.get('building_select')
+    select_floor = request.form.get('floor_select')
+    select_room = request.form.get('room_select')
+    sensor_info = get_json_template()
+    sensor_data = sensorInstanceFunc.get_sensor_info(select_sensor)
+    sensor_reg_info = sensor_info["sensor_catalogue_config"]
+    sensor_reg_info["place_id"] = "GGG_"+select_floor+"_"+select_room
+    sensor_reg_info["sensor_name"] = sensor_data["sensor_name"]
+    sensor_reg_info["sensor_type"] = sensor_data["sensor_type"]
+    sensor_reg_info["sensor_geolocation"] = address_dict[select_area]
+    sensor_reg_info["sensor_address"]["area"] = select_area
+    sensor_reg_info["sensor_address"]["building"] = select_building
+    sensor_reg_info["sensor_address"]["floor"] = select_floor
+    sensor_reg_info["sensor_address"]["room_no"] = select_room
+    sensor_reg_info["sensor_data_storage_details"]["kafka"]["broker_ip"] = sensor_data["user_id"]
+    sensor_reg_info["sensor_data_storage_details"]["kafka"]["topic"] = "abc"
+    sensor_json = {}
+    sensor_json["user_id"] = current_user.username
+    sensor_json["sensor_reg_config"] = sensor_reg_info
+    filepath = 'static/uploads/'+'sensor_instance_registration.json'
+    with open(filepath,'w') as f:
+        json.dump(sensor_json,f)
+
+    results= sensorInstanceFunc.fun2(sensor_json)
+    return render_template('index.html', user=current_user)
+
 
 
 if __name__ == "__main__":
