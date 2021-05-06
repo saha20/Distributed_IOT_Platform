@@ -1,44 +1,23 @@
 {
     "myapp" : {
-        "user_id" : "",
-        "application_name" : "",
+        "user_id" : "divyansh",
+        "application_name" : "Application1",
         "algorithms" : {
-            "algorithm1" : {
-                "isScheduled" : true,
-                "schedule" : {
-                    "time" : {
-                        "startTimes" : ["", ""],
-                        "durations" : ["",  ""]
-                    },
-                    "days" : ["Thursday", "lorem ipsum"]
-                },
-                "action" : {
-                    "user_display" : "lorem ipsum",
-                    "sensor_manager" : [{"sensor_id1" : "lorem ipsum"}],
-                    "notify_user" : {}
-                },
-                "sensors": {	
-                    "sensor1" : {
-                        "latitude" : "1234",
-                        "longitude" : "1234"
-                    }, 
-                    "sensor2" : {
-                        "latitude" : "12",
-                        "longitude" : "122"
-                    }
-                }
-            },
-            "algorithm2" : {
+            "algo1" : {
                 "isScheduled" : false,
                 "schedule" : {
                     "time" : {
-                        "startTimes" : ["13:15:20"],
-                        "durations" : ["00:00:08"]
+                        "startTimes" : ["00:45:00", "00:45:15"],
+                        "durations" : ["00:00:20",  "00:00:15"]
                     },
                     "days" : ["Monday", "Thursday", "Friday", "Saturday", "Sunday"]
                 },
-                "action" : {},
-                "sensors" : {}
+                "action" : {
+                    "user_display" : "Results",
+                    "sensor_manager" : [{"sensor_id1" : "command1"}],
+                    "notify_user" : []
+                },
+                "place_id" : "GGG_ground_floor_1"
             }
         }
     }

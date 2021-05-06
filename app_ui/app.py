@@ -327,9 +327,10 @@ def scheduling_request():
     requests.post('http://scheduler:13337/schedule_request',json=data)
     return render_template('index.html', user=current_user)
 
-def validateJSON(jsonData):
+def validateJSON(json_path):
     try:
-        json.loads(jsonData)
+        f = open(json_path)
+        data = json.load(f)
     except ValueError as err:
         return False
     return True
@@ -338,21 +339,22 @@ def check_format(uploaded_file, app_path, app_name, file_path):
     with zipfile.ZipFile(file_path, 'r') as zip_ref:
         zip_ref.extractall(app_path)
     
+    app_name = app_name[:-4]
     # check src file, exists or not.
-    src_path = app_path+"/"+app_name+"/src"
+    src_path = os.path.join(app_path, app_name, "src")
     if not os.path.exists(src_path):
         return jsonify({"status" : "src folder missing"})
 
 
     # check app_config.
-    config_filepath = app_path+"/"+app_name + "/app_config.json"
+    config_filepath = os.path.join(app_path, app_name, "app_config.json")
     if not os.path.exists(config_filepath):
         return jsonify({"status" : "app_config.json missing"})
     
     # validate json
     if not validateJSON(config_filepath):
-        return jsonify({"status" : "Invalid JSON file"})
-    
+        return jsonify({"status" : "Invalid JSON file", "json_path": config_filepath})
+
     return True
     
 def create_connection_mongo_cloud():
@@ -362,6 +364,11 @@ def create_connection_mongo_cloud():
     db2 = cluster.gridfs_example
     fs = GridFS(db2)
     return fs, coll
+
+def remove_file_uploads(app_path, app_name, file_path):
+    os.remove(file_path)
+    directory = 'rm -r' + os.path.join(app_path,app_name)
+    os.system(directory)
 
 @app.route('/uploads/', methods=["POST"])
 @login_required
@@ -376,25 +383,21 @@ def upload_file():
         uploaded_file.save(file_path)
     
     format_status = check_format(uploaded_file, app_path, app_name, file_path)
+
     if format_status == True:
-        pass
+        fs, coll = create_connection_mongo_cloud()
+        with open(file_path, "rb") as fp:
+            encoded = Binary(fp.read())
+        flink = fs.put(encoded, filename = app_name)
+        coll.insert_one({"filename": app_name, "file": flink })
+
+        os.remove(file_path)
+        return json.dumps({'status': 'Zip uploaded successfully'}), 200
     else:
+        remove_file_uploads(app_path, app_name, file_path)
         return format_status
 
-    fs, coll = create_connection_mongo_cloud()
-
-    with open(file_path, "rb") as fp:
-        encoded = Binary(fp.read())
-    flink = fs.put(encoded, filename = app_name)
-
-    coll.insert_one({"filename": app_name, "file": flink })
-
-    os.remove(file_path)
-
-    return json.dumps({'status': 'Zip uploaded successfully'}), 200
-
 ####  end routes  ####
-
 
 # required function for loading the right user
 @login_manager.user_loader
@@ -553,5 +556,5 @@ if __name__ == "__main__":
 	# change to app.run(host="0.0.0.0"), if you want other machines to be able to reach the webserver.
     # db.create_all()
     # call apurva's api and 
-    app.run(port=9999, threaded=True, host='0.0.0.0')
+    app.run(port=5001, threaded=True, host='0.0.0.0')
     # app.run(host="localhost",port=5005)
