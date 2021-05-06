@@ -61,7 +61,7 @@ def logLoadBalancer(req):
 def informSensorManager(service_id):
 	print("here in inform sensor manager")
 	req = {}
-	req['service_id'] = service_id
+	req['serviceid'] = service_id
 	# rsp = rq.post(lb_url+'/return_host', json = req)
 	rsp = rq.post(sm_url+'/stopService', json = req)
 	print("received response---",rsp)
