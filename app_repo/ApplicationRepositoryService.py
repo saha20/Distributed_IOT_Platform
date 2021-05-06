@@ -82,10 +82,10 @@ def sendAppToMachine():
 	#create action json file
 	json_filename = str(service_id) + '.json'
 	with open('./helpers/'+json_filename, 'w') as outfile:
-    	json.dump(action_details, outfile)
+		json.dump(action_details, outfile)
 
-    #download files from mongodb
-    
+	#download files from mongodb
+	
 
 	
 	#ssh to client
