@@ -4,7 +4,7 @@
         "application_name" : "Application1",
         "algorithms" : {
             "algo1" : {
-                "isScheduled" : true,
+                "isScheduled" : false,
                 "schedule" : {
                     "time" : {
                         "startTimes" : ["00:45:00", "00:45:15"],

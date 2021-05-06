@@ -23,31 +23,31 @@ app = Flask(__name__)
 app.config['DEBUG'] = True
 @app.route("/return_host", methods=["GET", "POST"])
 def returnServer():
-    # get server with lowest request handling
-    l = hostcol.find()     #get_hosts
-    loads={}
-    if l.count()==0:
-     return jsonify(
-     status=0
-    )
-    for host in l:
-        try:
-            URL="http://"+host["name"]+":5000/get_load"
-            r = requests.get(url = URL).json()
-            tup=(r["mem_load"],r["cpu_load"])
-            loads[host["name"]]=tup
-        except:
-            callfaultTolerance(host['name'])
-            #print(loads,file=sys.stderr)    
-    srt=sorted([(value,key) for (key,value) in loads.items()])
-    print("Deploy on ",srt[0],file=sys.stderr)
-    if srt==None or srt[0][0][0]>=100:
-        return jsonify(
-            status=0
-        )
-    return jsonify(
-        machine_name=srt[0][1]
-    )
+	# get server with lowest request handling
+	l = hostcol.find()     #get_hosts
+	loads={}
+	if l.count()==0:
+	 return jsonify(
+	 {"status" : 0}
+	)
+	for host in l:
+		try:
+			URL="http://"+host["name"]+":5000/get_load"
+			r = requests.get(url = URL).json()
+			tup=(r["mem_load"],r["cpu_load"])
+			loads[host["name"]]=tup
+		except:
+			callfaultTolerance(host['name'])
+			#print(loads,file=sys.stderr)    
+	srt=sorted([(value,key) for (key,value) in loads.items()])
+	print("Deploy on ",srt[0],file=sys.stderr)
+	if srt==None or srt[0][0][0]>=100:
+		return jsonify(
+		   { "status" : 0}
+		)
+	return jsonify(
+		{"machine_name" : srt[0][1]}
+	)
 # @app.route("/log_service", methods=["GET", "POST"])
 # def logService():
  # # log in db, which application is running in which machine/server
@@ -59,12 +59,12 @@ def returnServer():
  # retr= appcol.find_one(item) #find item
  
  # if not retr:   #item not found
-     # item["ip"]=content["ip"]
-     # appcol.insert_one(item)         #new entry
+	 # item["ip"]=content["ip"]
+	 # appcol.insert_one(item)         #new entry
  # else:          #item found
-    # return jsonify(
-        # status="0"
-        # )
+	# return jsonify(
+		# status="0"
+		# )
 
  # return jsonify(
  # status="1"
@@ -82,9 +82,9 @@ def returnServer():
  # retr= appcol.find_one(item) #find item
  
  # if not retr:   #item not found
-     # return jsonify(
-         # status="0"
-         # )
+	 # return jsonify(
+		 # status="0"
+		 # )
  
  # appcol.delete_one(item)
  # return jsonify(
@@ -92,42 +92,42 @@ def returnServer():
  # )
 
 def json_deserializer(data):
-    return json.dumps(data).decode('utf-8')
+	return json.dumps(data).decode('utf-8')
 
 def json_serializer(data):
-    return json.dumps(data).encode("utf-8")
+	return json.dumps(data).encode("utf-8")
 
 def callfaultTolerance(module_name) :
-    print(f"{module_name} FAILED !!!")
-    to_send={}
-    to_send['module_name'] = module_name
+	print(f"{module_name} FAILED !!!")
+	to_send={}
+	to_send['module_name'] = module_name
 
-    json_object = json.dumps(to_send)
-    fault_tolerance_url = 'http://host.docker.internal:6969/faulty'
-    try :
-        resp = requests.post(fault_tolerance_url, json = to_send)
-        print(resp.text)
-    except :
-        print("Can't connect to Fault Tolerance Module")
-    # communicate fault tolerance 
-    
+	json_object = json.dumps(to_send)
+	fault_tolerance_url = 'http://host.docker.internal:6969/faulty'
+	try :
+		resp = requests.post(fault_tolerance_url, json = to_send)
+		print(resp.text)
+	except :
+		print("Can't connect to Fault Tolerance Module")
+	# communicate fault tolerance 
+	
 def heartBeat():
-    kafka_platform_ip = 'kafka:9092'
-    producer = KafkaProducer(bootstrap_servers=[kafka_platform_ip],value_serializer =json_serializer)
-    while True:
-        t = time.localtime()
-        current_time = int (time.strftime("%H%M%S", t))
-        # print(current_time)
+	kafka_platform_ip = 'kafka:9092'
+	producer = KafkaProducer(bootstrap_servers=[kafka_platform_ip],value_serializer =json_serializer)
+	while True:
+		t = time.localtime()
+		current_time = int (time.strftime("%H%M%S", t))
+		# print(current_time)
 
-        data = {"module" : "load_balancer" , "ts" : current_time , "Status" : 1   }
-        producer.send("HeartBeat", data)
-        producer.flush()
-        time.sleep(3)
+		data = {"module" : "load_balancer" , "ts" : current_time , "Status" : 1   }
+		producer.send("HeartBeat", data)
+		producer.flush()
+		time.sleep(3)
 
 
 if __name__ == "__main__":
-    thread1 = threading.Thread(target = heartBeat)
-    thread1.start()
+	thread1 = threading.Thread(target = heartBeat)
+	thread1.start()
  # change to app.run(host="0.0.0.0"), if you want other machines to be able to reach the webserver.
-    app.run(host='0.0.0.0',port=55555) 
+	app.run(host='0.0.0.0',port=55555) 
  # app.run(host=socket.gethostbyname(socket.gethostname()),port=55555) 
