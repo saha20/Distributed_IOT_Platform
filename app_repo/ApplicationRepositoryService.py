@@ -69,6 +69,11 @@ def sendConfigFile():
 	req = request.json
 	print("got request from deployer")
 	app_name = req['app_id']
+
+	#download zip file from mongodb
+	application_filename = app_name+'.zip'
+	get_files_to_local(application_filename)
+
 	file_path = "./repository/"+app_name+'/app_config.json'
 	file = open(file_path,'r')
 	config_obj = json.load(file)
@@ -76,6 +81,7 @@ def sendConfigFile():
 	return jsonify(config_obj)
 
 def get_files_to_local(application_filename):
+	print("application filename is ",application_filename )
 	cluster = MongoClient(dburl)
 	db = cluster[db_name]
 	coll = db[collection_name]
@@ -87,13 +93,18 @@ def get_files_to_local(application_filename):
 		data = grid_out.read()
 
 	with open("./repository/"+application_filename,"wb") as f:
+		print("got file")
 		f.write(data)
 
 
 	#extraxt files from zip
 	zip_path = "./repository/"+application_filename
 	app_path = "./repository/"
+	# if not os.path.exists(app_path):
+	# 	os.makedirs(app_path)
+
 	with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+		print("app path ", app_path)
 		zip_ref.extractall(app_path)
 	
 	os.remove(zip_path)
@@ -118,8 +129,8 @@ def sendAppToMachine():
 		json.dump(action_details, outfile)
 
 	#download files from mongodb in repository folder
-	application_filename = app_id+'.zip'
-	get_files_to_local(application_filename)
+	# application_filename = app_id+'.zip'
+	# get_files_to_local(application_filename)
 
 	
 	#ssh to client
@@ -183,8 +194,8 @@ def heartBeat():
 
 
 if __name__ == "__main__":
-	thread1 = threading.Thread(target = heartBeat)
-	thread1.start()
+	# thread1 = threading.Thread(target = heartBeat)
+	# thread1.start()
 	app.run(host= '0.0.0.0', port=app_repo_port, debug=False)
 	# app.run(host=socket.gethostbyname(socket.gethostname()), port=app_repo_port, debug=False)
 	# t1 = threading.Thread(target=initiateAppRepo)
