@@ -111,6 +111,25 @@
 				 "all_sensors" : "yes"
 			  }
 		   }
+		},
+		"algo3":{
+		   "code":"bus_barricade.py",
+		   "dependency":{
+			  
+		   },
+		   "environment":{
+			  "flask":"False",
+			  "python3-alpine":"False",
+			  "python3-packages":[
+				 
+			  ]
+		   },
+		   "sensors":{
+			  "senosr_type_1":{
+				 "sensor_type" : "gps_iiith_bus",
+				 "all_sensors" : "yes"
+			  }
+		   }
 		}
 	 },
 	 "application_id":"Application2",

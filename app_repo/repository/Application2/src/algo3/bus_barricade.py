@@ -4,7 +4,12 @@ from read_sensor_info import *
 def json_serializer(data):
 	return json.dumps(data).encode("utf-8")
 
-def bus_near(curr_lat1, curr_long1, curr_lat2, curr_long2, dist_threshold=200):
+def get_barricade_lat_long():
+	l1 = [0,30,60,90]
+	l2 = [0,30,60,90]
+	return l1,l2
+
+def bus_near(curr_lat1, curr_long1, curr_lat2, curr_long2, dist_threshold=500):
 	p = (float(curr_lat1),float(curr_long1))
 	q = (float(curr_lat2),float(curr_long2))
 	distance = math.sqrt(sum([(a - b) ** 2 for a, b in zip(p, q)]))
@@ -14,10 +19,7 @@ def bus_near(curr_lat1, curr_long1, curr_lat2, curr_long2, dist_threshold=200):
 
 def fun(temp_topic, output_topic, serviceid, json_filename):
 
-	college_lat = 0
-	college_long = 0 
-	bus_location_dict = {}
-	bus_gps_sensor_id_dict = {}
+	barricade_lat_list, barricade_long_list  = get_barricade_lat_long() 
 	notif_list = parse_notification_info(json_filename)
 
 	consumer = KafkaConsumer(str(temp_topic),bootstrap_servers=[KAFKA_PLATFORM_IP], auto_offset_reset = "latest")
@@ -31,23 +33,14 @@ def fun(temp_topic, output_topic, serviceid, json_filename):
 		if sensor_type == "gps_iiith_bus":
 			print("gps sensor_data : ",sensor_data)
 			place_id, curr_bus_lat, curr_bus_long = get_gps_data(sensor_data)
-			bus_gps_sensor_id_dict[place_id] = sensor_id
 
-			# usecase 3
-			bus_location_dict[place_id] = (curr_bus_lat, curr_bus_long)
-			notification_to_send_to_bus_list = []
-
-			for bus in bus_location_dict:
-				if(bus == place_id):
-					continue
-				if(bus_near(bus_location_dict[bus][0],bus_location_dict[bus][1],bus_location_dict[place_id][0],bus_location_dict[place_id][1])):
-					notification_to_send_to_bus_list.append(bus)
-
-			number_of_buses_near_this_bus = len(notification_to_send_to_bus_list)
-			if(number_of_buses_near_this_bus>=2):
-				for bus in notification_to_send_to_bus_list:
-					display_msg = "More than 3 buses in this area, "+ bus +" please divert your route."
-					msg = message_to_action_manager(display_msg, bus_gps_sensor_id_dict[bus], display_msg, [])
+			# usecase 4
+			for i in range(len(barricade_lat_list)):
+				b_lat = barricade_lat_list[i]
+				b_long = barricade_long_list[i]
+				if(bus_near(curr_bus_lat,curr_bus_long,b_lat,b_long)):
+					display_msg = "Bus number "+place_id+" has reached near the college barricade "+str(i)+"."
+					msg = message_to_action_manager(display_msg, "None", "None", notif_list)
 					print(msg)
 					producer.send(str(output_topic), msg)
 					producer.flush()

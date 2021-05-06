@@ -9,7 +9,6 @@ import math
 import json
 KAFKA_PLATFORM_IP = 'localhost:9092'
 # KAFKA_PLATFORM_IP = 'kafka:9092'
-
 # RPC file to read sensor info
 # read_sensor_info
 
@@ -32,6 +31,17 @@ def get_gps_data(s):
 	data = s.split(',')
 	return data[0],data[1],data[2]  
 	# eg : bus_10,29,45 --> place_id,lat,long
+
+def parse_notification_info(filename):
+
+	notif_list = []
+	f = open("./"+filename)
+	json_object = json.load(f)
+	for l in json_object['notify_user']:
+		notif_list.append(str(l))
+
+	return notif_list
+
 
 def message_to_action_manager(display_msg, sensor_id, command, notif_list):
 
