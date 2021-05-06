@@ -10,6 +10,7 @@ collection_names = [
 	"deployer_logs",
 	"host_log",
 	"logger_current",
+	"action_manager_log"
 	]
 	
 modules_to_bootstrap = [ 
@@ -121,8 +122,9 @@ def return_ip_json():
 @app.route("/faulty", methods=["POST"])     #main function
 def get_faulty_module():
 	req = request.json
-	print("got request from heartBeat Manager")
+	print("Got below request ")
 	print(req)
+	print()
 	module_name = req['module_name']
 	if is_running(module_name):
 		return jsonify({"Status": f'{module_name} is already running'})

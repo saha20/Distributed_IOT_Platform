@@ -17,73 +17,79 @@ dburl = "mongodb://apurva:user123@cluster0-shard-00-00.p4xv2.mongodb.net:27017,c
 db_name = "IAS_test_1"
 myclient = pymongo.MongoClient(dburl)
 mydb = myclient[db_name]
-appcol = mydb["application_log"]
+#appcol = mydb["application_log"]
 hostcol = mydb["host_log"]
 app = Flask(__name__)
 app.config['DEBUG'] = True
 @app.route("/return_host", methods=["GET", "POST"])
 def returnServer():
- # get server with lowest request handling
- l = hostcol.find()     #get_hosts
- loads={}
- if l.count()==0:
+    # get server with lowest request handling
+    l = hostcol.find()     #get_hosts
+    loads={}
+    if l.count()==0:
      return jsonify(
      status=0
- )
- for host in l:
-     URL="http://"+host["name"]+":5000/get_load"
-     r = requests.get(url = URL).json()
-     tup=(r["mem_load"],r["cpu_load"])
-     loads[host["name"]]=tup
- #print(loads,file=sys.stderr)    
- srt=sorted([(value,key) for (key,value) in loads.items()])
- print("Deploy on ",srt[0],file=sys.stderr)
-     
- return jsonify(
-     machine_name=srt[0]
- )
-@app.route("/log_service", methods=["GET", "POST"])
-def logService():
- # log in db, which application is running in which machine/server
- # we require user_id, application_id, ip, port
- content=request.json
- #item to search
- item={"app_id":content["app_id"],"user_id":content["user_id"],"service_name_to_run":content["service_name_to_run"],"service_id":content["service_id"]}
- 
- retr= appcol.find_one(item) #find item
- 
- if not retr:   #item not found
-     item["ip"]=content["ip"]
-     appcol.insert_one(item)         #new entry
- else:          #item found
-    return jsonify(
-        status="0"
+    )
+    for host in l:
+        try:
+            URL="http://"+host["name"]+":5000/get_load"
+            r = requests.get(url = URL).json()
+            tup=(r["mem_load"],r["cpu_load"])
+            loads[host["name"]]=tup
+        except:
+            callfaultTolerance(host['name'])
+            #print(loads,file=sys.stderr)    
+    srt=sorted([(value,key) for (key,value) in loads.items()])
+    print("Deploy on ",srt[0],file=sys.stderr)
+    if srt==None or srt[0][0][0]>=100:
+        return jsonify(
+            status=0
         )
-
- return jsonify(
- status="1"
- )
-
-
-@app.route("/free_service", methods=["GET", "POST"])
-def freeService():
- # if a machine is not handling any request close it.
- # we require user_id, application_id, ip, port
- content=request.json
- #item to search
- item={"app_id":content["app_id"],"user_id":content["user_id"],"service_name_to_run":content["service_name_to_run"],"service_id":content["service_id"],"ip":content["ip"]}
+    return jsonify(
+        machine_name=srt[0][1]
+    )
+# @app.route("/log_service", methods=["GET", "POST"])
+# def logService():
+ # # log in db, which application is running in which machine/server
+ # # we require user_id, application_id, ip, port
+ # content=request.json
+ # #item to search
+ # item={"app_id":content["app_id"],"user_id":content["user_id"],"service_name_to_run":content["service_name_to_run"],"service_id":content["service_id"]}
  
- retr= appcol.find_one(item) #find item
+ # retr= appcol.find_one(item) #find item
  
- if not retr:   #item not found
-     return jsonify(
-         status="0"
-         )
+ # if not retr:   #item not found
+     # item["ip"]=content["ip"]
+     # appcol.insert_one(item)         #new entry
+ # else:          #item found
+    # return jsonify(
+        # status="0"
+        # )
+
+ # return jsonify(
+ # status="1"
+ # )
+
+
+# @app.route("/free_service", methods=["GET", "POST"])
+# def freeService():
+ # # if a machine is not handling any request close it.
+ # # we require user_id, application_id, ip, port
+ # content=request.json
+ # #item to search
+ # item={"app_id":content["app_id"],"user_id":content["user_id"],"service_name_to_run":content["service_name_to_run"],"service_id":content["service_id"],"ip":content["ip"]}
  
- appcol.delete_one(item)
- return jsonify(
- status="1"
- )
+ # retr= appcol.find_one(item) #find item
+ 
+ # if not retr:   #item not found
+     # return jsonify(
+         # status="0"
+         # )
+ 
+ # appcol.delete_one(item)
+ # return jsonify(
+ # status="1"
+ # )
 
 def json_deserializer(data):
     return json.dumps(data).decode('utf-8')
@@ -91,7 +97,20 @@ def json_deserializer(data):
 def json_serializer(data):
     return json.dumps(data).encode("utf-8")
 
+def callfaultTolerance(module_name) :
+    print(f"{module_name} FAILED !!!")
+    to_send={}
+    to_send['module_name'] = module_name
 
+    json_object = json.dumps(to_send)
+    fault_tolerance_url = 'http://host.docker.internal:6969/faulty'
+    try :
+        resp = requests.post(fault_tolerance_url, json = to_send)
+        print(resp.text)
+    except :
+        print("Can't connect to Fault Tolerance Module")
+    # communicate fault tolerance 
+    
 def heartBeat():
     kafka_platform_ip = 'kafka:9092'
     producer = KafkaProducer(bootstrap_servers=[kafka_platform_ip],value_serializer =json_serializer)

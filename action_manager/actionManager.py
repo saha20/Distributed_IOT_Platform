@@ -5,8 +5,8 @@ from pymongo import MongoClient
 
 
 # collection_name = "sensors_registered"   # sensors_registered_document
-logging_collection = "logger_current"
-logging_archive = "logger_archive"
+logging_collection = "action_manager_log"
+# logging_archive = "logger_archive"
 
 recv_state = "received"
 sent_state = "sent"
@@ -17,8 +17,9 @@ stop_command = "stop"
 
 
 
-dburl = "mongodb://souptik:admin@cluster0-shard-00-00.dgspa.mongodb.net:27017,cluster0-shard-00-01.dgspa.mongodb.net:27017,cluster0-shard-00-02.dgspa.mongodb.net:27017/IAS_TEST_1?ssl=true&replicaSet=atlas-11r7c8-shard-0&authSource=admin&retryWrites=true&w=majority"
-db_name = "IAS_TEST_1"
+# dburl = "mongodb://souptik:admin@cluster0-shard-00-00.dgspa.mongodb.net:27017,cluster0-shard-00-01.dgspa.mongodb.net:27017,cluster0-shard-00-02.dgspa.mongodb.net:27017/IAS_TEST_1?ssl=true&replicaSet=atlas-11r7c8-shard-0&authSource=admin&retryWrites=true&w=majority"
+dburl = "mongodb://apurva:user123@cluster0-shard-00-00.p4xv2.mongodb.net:27017,cluster0-shard-00-01.p4xv2.mongodb.net:27017,cluster0-shard-00-02.p4xv2.mongodb.net:27017/IAS_test_1?ssl=true&replicaSet=atlas-auz41v-shard-0&authSource=admin&retryWrites=true&w=majority"
+db_name = "IAS_test_1"
 
 kafka_platform_ip = None
 sms , email , sms_email = 1 , 2 , 3     
