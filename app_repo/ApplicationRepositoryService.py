@@ -9,6 +9,15 @@ from os import listdir
 from flask import Flask, jsonify, request
 import threading
 import socket
+import pymongo
+import base64
+import bson
+from bson.binary import Binary
+from pymongo import MongoClient
+from bson.objectid import ObjectId
+import gridfs
+from bson.json_util import dumps, loads
+import json
 
 app_repo_ip = 'app_repo'
 app_repo_port = 7007
@@ -66,6 +75,30 @@ def sendConfigFile():
 	print("send config")
 	return jsonify(config_obj)
 
+def get_files_to_local(application_filename):
+	cluster = MongoClient(dburl)
+	db = cluster[db_name]
+	coll = db[collection_name]
+	db2 = cluster.gridfs_example
+	fs = gridfs.GridFS(db2)
+
+	#downloading file from mongodb
+	for grid_out in fs.find({"filename": application_filename}):
+		data = grid_out.read()
+
+	with open("./repository/"+application_filename,"wb") as f:
+		f.write(data)
+
+
+	#extraxt files from zip
+	zip_path = "./repository/"+application_filename
+	app_path = "./repository/"
+	with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+		zip_ref.extractall(app_path)
+	
+	os.remove(zip_path)
+
+
 @app.route('/send_files_machine',methods=['GET', 'POST'])
 def sendAppToMachine():
 	print('hitted send file to machine')
@@ -84,8 +117,9 @@ def sendAppToMachine():
 	with open('./helpers/'+json_filename, 'w') as outfile:
 		json.dump(action_details, outfile)
 
-	#download files from mongodb
-	
+	#download files from mongodb in repository folder
+	application_filename = app_id+'.zip'
+	# get_files_to_local(application_filename)
 
 	
 	#ssh to client
