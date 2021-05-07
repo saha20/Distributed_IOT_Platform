@@ -4,6 +4,7 @@ import multiprocessing
 #not using sensorlogs
 
 collection_name = "sensors_registered"   #sensor_document
+general_log_collection_name = "sensor_manager_visual_logs"
 
 stop_state = "stopped"
 running_state = "running"
@@ -11,6 +12,10 @@ running_state = "running"
 restart_command = "restart"
 start_command = "start"
 stop_command = "stop"
+
+def general_log(coll,d):
+	print("inserting  "+str(d))
+	coll.insert_one(d)
 
 proceesses_running = []
 app = Flask(__name__)
@@ -24,13 +29,25 @@ def stopSensorManagerUtil():
 	res = {
 		'msg' : msg
 	}
-	return jsonify(res)
+	jres = jsonify(res)
+	cluster = MongoClient(dburl)
+	db = cluster[db_name]
+	general_log_collection = db[general_log_collection_name]
+	general_log(general_log_collection, res)
+	return jres
 
 @app.route('/sensorManagerStartService', methods = ['GET','POST'])
 def sensorManagerUtil():
 
-	data = request.get_json(force=True)
+	cluster = MongoClient(dburl)
+	db = cluster[db_name]
+	general_log_collection = db[general_log_collection_name]
 
+	data = request.get_json(force=True)
+	log_res = {
+		'Data_received_deployer' : data
+	}
+	general_log(general_log_collection, log_res)
 	# change for place id
 	# correctly_parsed_outer_json, userid, applicationName, servicename, serviceid,latitude, longitude, config_file, not_correct_list  = parse_request_sensor_manager(data)
 	
@@ -40,11 +57,13 @@ def sensorManagerUtil():
 		msg = "Fields "
 		for field in not_correct_list:
 			msg = msg + field+ ", "
-		msg = msg + " not present in the input received from service node."
+		msg = msg + " not present in the input received from service node, serviceid : "+serviceid+"."
 		res = { 
 			'Error' : msg
 		}
-		return jsonify(res)
+		jres = jsonify(res)
+		general_log(general_log_collection, res)
+		return jres
 
 
 	#list of all sensors used for this service
@@ -53,7 +72,9 @@ def sensorManagerUtil():
 		res = { 
 			'Error' : msg
 		}
-		return jsonify(res)
+		jres = jsonify(res)
+		general_log(general_log_collection, res)
+		return jres
 
 	print("required_sensor_types_list : ")
 	print(required_sensor_types_list)
@@ -75,10 +96,12 @@ def sensorManagerUtil():
 		res = {
 			'Error' : msg
 		}
-		res = { 
-			'Error' : msg
-		}
-		return jsonify(res)
+		jres = jsonify(res)
+		# res = { 
+		# 	'Error' : msg
+		# }
+		general_log(general_log_collection, res)
+		return jres
 	# print("sensor_topic_id_name_list_for_all_sensors : ",sensor_topic_id_name_list_for_all_sensors)
 
 
@@ -91,9 +114,11 @@ def sensorManagerUtil():
 
 	print(f'temptopic of serviceid {serviceid} is {temptopic}')
 	res = { 
-		'temporary_topic' : temptopic
+		'temporary_topic' : str(temptopic)
 	}
-	return jsonify(res)
+	jres = jsonify(res)
+	general_log(general_log_collection, res)
+	return jres
 
 if __name__ == '__main__':
 	print("Inside sensor_manager")
@@ -102,8 +127,6 @@ if __name__ == '__main__':
 	# cluster = MongoClient(dburl)
 	# global db 
 	# db = cluster[db_name]
-
-	
 	# start listening to the action manager
 	main_pid = os.getpid()
 	t1 = threading.Thread(target = listen_action_manager, args=())
