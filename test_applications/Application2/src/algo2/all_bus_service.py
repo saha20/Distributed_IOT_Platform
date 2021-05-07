@@ -1,5 +1,5 @@
 from read_sensor_info import *
-import sendHeartbeat as sh
+from service_heartbeat import *
 # this service will be run for all buses just once instance
 
 def json_serializer(data):
@@ -48,7 +48,7 @@ def fun(temp_topic, output_topic, serviceid, json_filename):
 			if(number_of_buses_near_this_bus>=2):
 				for bus in notification_to_send_to_bus_list:
 					display_msg = "More than 3 buses in this area, "+ bus +" please divert your route."
-					msg = message_to_action_manager(display_msg, bus_gps_sensor_id_dict[bus], display_msg, [])
+					msg = message_to_action_manager(display_msg, bus_gps_sensor_id_dict[bus], display_msg, [],serviceid)
 					print(msg)
 					producer.send(str(output_topic), msg)
 					producer.flush()
@@ -64,6 +64,6 @@ if __name__ == '__main__':
 	
 	application_thread = threading.Thread(target = fun, args=(temp_topic, output_topic, service_id, json_filename,))
 	application_thread.start()
-	heartbeat_thread = threading.Thread(target = sh.sendHeartbeat, args = (service_id,))
+	heartbeat_thread = threading.Thread(target = sendHeartbeat, args = (service_id,))
 	heartbeat_thread.start()
 
