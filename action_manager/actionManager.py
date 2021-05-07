@@ -181,8 +181,8 @@ def notifySensorManager(service_id, to_sensor_manager, to_notify_users, to_user_
 		count += 1 
 		if count == 2 :
 			logging_entry = {
-				"sensor_id" : temp_list[0],
-				"command" : temp_list[1]
+				"sensor_id" : temp_list[0]["sensor_id"],
+				"command" : temp_list[1]["command"]
 			}
 			collection.insert_one(logging_entry)
 			print("inserted in db")
