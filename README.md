@@ -25,3 +25,5 @@ allocatedPool":{
 ##### template update,
 ##### dyanmic populate applications.
 
+##### zip the applications in test_applications folder and put them in app_repo/repository
+
