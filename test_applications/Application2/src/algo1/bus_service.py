@@ -1,5 +1,6 @@
 from read_sensor_info import *
-import sendHeartbeat as sh
+from service_heartbeat import *
+#import sendHeartbeat as sh
 # this service will be run seperately for every bus
 
 def json_serializer(data):
@@ -46,7 +47,7 @@ def fun(temp_topic, output_topic, serviceid, json_filename):
 			fare_amount = calculate_fare(curr_bus_lat, curr_bus_long, college_lat, college_long)
 			for person in new_passangers:
 				display_msg = "Collect "+str(fare_amount)+" rs from "+person+" in "+place_id+"."
-				msg = message_to_action_manager(display_msg, "None", "None", notif_list)
+				msg = message_to_action_manager(display_msg, "None", "None", notif_list,serviceid)
 				print(msg)
 				producer.send(str(output_topic), msg)
 				producer.flush()
@@ -58,7 +59,7 @@ def fun(temp_topic, output_topic, serviceid, json_filename):
 				display_msg = "The temperature is "+str(temp_value)+". Switching on the A/C."
 				command = "turn on a/c"
 				ac_on = True
-				msg = message_to_action_manager(display_msg, sensor_id, command, [])
+				msg = message_to_action_manager(display_msg, sensor_id, command, [],serviceid)
 				print(msg)
 				producer.send(str(output_topic), msg)
 				producer.flush() 
@@ -67,7 +68,7 @@ def fun(temp_topic, output_topic, serviceid, json_filename):
 				display_msg = "The temperature is "+str(temp_value)+". Switching off the A/C."
 				command = "turn off a/c"
 				ac_on = False
-				msg = message_to_action_manager(display_msg, sensor_id, command, [])
+				msg = message_to_action_manager(display_msg, sensor_id, command, [],serviceid)
 				print(msg)
 				producer.send(str(output_topic), msg)
 				producer.flush() 
@@ -79,7 +80,7 @@ def fun(temp_topic, output_topic, serviceid, json_filename):
 				command = "turn on lights"
 				notif_list = []
 				light_on = True
-				msg = message_to_action_manager(display_msg, sensor_id, command, [])
+				msg = message_to_action_manager(display_msg, sensor_id, command, [],serviceid)
 				print(msg)
 				producer.send(str(output_topic), msg)
 				producer.flush() 
@@ -89,7 +90,7 @@ def fun(temp_topic, output_topic, serviceid, json_filename):
 				command = "turn off lights"
 				notif_list = []
 				light_on = False
-				msg = message_to_action_manager(display_msg, sensor_id, command, [])
+				msg = message_to_action_manager(display_msg, sensor_id, command, [],serviceid)
 				print(msg)
 				producer.send(str(output_topic), msg)
 				producer.flush() 
@@ -104,6 +105,7 @@ if __name__ == '__main__':
 	json_filename = sys.argv[4]
 	
 	application_thread = threading.Thread(target = fun, args=(temp_topic, output_topic, service_id, json_filename,))
+
 	application_thread.start()
-	heartbeat_thread = threading.Thread(target = sh.sendHeartbeat, args = (service_id,))
+	heartbeat_thread = threading.Thread(target = sendHeartbeat, args = (service_id,))
 	heartbeat_thread.start()
