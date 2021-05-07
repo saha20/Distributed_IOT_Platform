@@ -18,7 +18,7 @@
                                 <i class="fa fa-dashboard"></i>  <a href="/">Dashboard</a>
                             </li>
                             <li class="active">
-                                <i class="fa fa-edit"></i> Sensor Catalogue Registration
+                                <i class="fa fa-edit"></i> Sensor Instance Registration
                             </li>
                         </ol>
                     </div>
@@ -27,7 +27,7 @@
                 <form class="form-inline" method="POST" action="/sensorsSelect">
                   <div class="form-group">
                     <div class="input-group">
-                        <span class="input-group-addon">Please select</span>
+                        <span class="input-group-addon">Sensors</span>
                             <select name="comp_select" class="selectpicker form-control">
                               {% for o in data %}
                               <option value="{{ o }}">{{ o }}</option>
@@ -38,17 +38,46 @@
                     <br>
                     <br>
                     <div class="form-group">
-                      <div class="input-group">
+                      <!-- <div class="input-group">
                             <span class="input-group-addon">Please select</span>
                                 <select name="area_select" class="selectpicker form-control">
                                   {% for i in area %}
                                   <option value="{{ i }}">{{ i }}</option>
                                   {% endfor %}
                                 </select>
-                    </div>
+                    </div> -->
+
+                        <label>Area</label>
+                        <input class="form-control" placeholder="Enter text" name="area" defaultValue="None">
+
                   <br>
                   <br>
-                    <div class="form-group">
+                  <label>Building</label>
+                  <input class="form-control" placeholder="Enter text" name="building" defaultValue="None">
+                  <br>
+                  <br>
+                  <label>Floor</label>
+                  <input class="form-control" placeholder="Enter text" name="floor" defaultValue="None">
+                  <br>
+                  <br>
+                  <label>Room</label>
+                  <input class="form-control" placeholder="Enter text" name="room" defaultValue="None">
+                  <br>
+                  <br>
+                  <label>Place ID</label>
+                  <input class="form-control" placeholder="Enter text" name="place_id" required>
+                  <br>
+                  <br>
+                  <label>Latitude</label>
+                  <input type = "number" class="form-control" placeholder="Enter text" name="lat" defaultValue="167">
+                  <br>
+                  <br>
+                  <label>Longitude</label>
+                  <input type="number" class="form-control" placeholder="Enter text" name="long" defaultValue="196">
+                  <br>
+                  <br>
+
+                    <!-- <div class="form-group">
                       <div class="input-group">
                             <span class="input-group-addon">Please select</span>
                                 <select name="building_select" class="selectpicker form-control">
@@ -78,8 +107,8 @@
                                   <option value="{{ i }}">{{ i }}</option>
                                   {% endfor %}
                                 </select>
-                    </div>
-                    <button type="submit" class="btn btn-default">Go</button>
+                    </div> -->
+                    <button type="submit" class="btn btn-default">Add Sensor Instance</button>
                   </div>
                 </form>
 

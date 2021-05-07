@@ -53,6 +53,7 @@ def fun2(data):
         return msg
     user_id = incoming_data["user_id"]
     config = incoming_data["sensor_catalogue_config"]
+    print("Config before deleting - ",config)
     config = remove_unnecessary_data(config)
     print("Config - ",config)
     cluster = MongoClient(dburl)
