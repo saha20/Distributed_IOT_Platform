@@ -24,13 +24,16 @@ def create_fake_sensor_data(sensor_type, place_id):
 		return random.randrange(1, 107527)
 
 	elif (sensor_type == 'hook_rotation'):
-		return random.randrange(1, 3000)
+		return random.randrange(1, 60)
 
 	elif (sensor_type == 'thread_remaining'): 
-		return random.randrange(5, 2000)
+		return random.randrange(0, 20)
 
 	elif(sensor_type == 'stitch_setting'):
-		return random.randrange(1, 5000)	
+		return random.randrange(1, 5000)
+
+	elif(sensor_type == 'temperature_sensors'):
+		return random.randrange(1, 70)	
 
 	return 0;
 
