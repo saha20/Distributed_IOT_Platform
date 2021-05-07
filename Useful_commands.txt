@@ -1,9 +1,16 @@
 Stop all docker 
- docker stop $(docker ps -aq)
+ sudo docker stop $(sudo docker ps -aq)
 
 
 
 Remove all docker
- docker rm $(docker ps -aq)
+ sudo docker rm $(sudo docker ps -aq)
 
-docker cp DeployerService.py deployer:/work_dir/
+docker cp Deployer  Service.py deployer:/work_dir/
+
+stopping zookeper
+    sudo service stop zookeper
+    sudo lsof -i:2181 (finds particular port has any process working on it or not)
+    sudo docker exec -it worker_node_2
+    sudo docker exec -it worker_node_2 sh
+    

@@ -28,7 +28,7 @@ modules_to_bootstrap = [
 	]
 
 def get_ip(module_name):
-	cmd = 'docker inspect -f \'{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}\' '+ module_name
+	cmd = 'sudo docker inspect -f \'{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}\' '+ module_name
 	return os.popen(cmd).read().strip()
 
 def start_worker(module_name):
@@ -37,12 +37,12 @@ def start_worker(module_name):
 	mydb = myclient[db_name]
 	hostcol = mydb["host_log"]
 
-	build = f'docker build -t service_host ./service_host'
-	subprocess.call((build))
+	build = f'sudo docker build -t service_host ./service_host'
+	subprocess.call((build),shell=True)
 
-	cmd = f'docker run -d  --network dbz --name {module_name} service_host'
+	cmd = f'sudo docker run -d  --add-host host.docker.internal:host-gateway --network dbz --name {module_name} service_host'
 	try : 
-		subprocess.call((cmd))
+		subprocess.call((cmd),shell=True)
 		ip = get_ip(module_name)
 		print(f" {module_name} running on address {ip}")
 		
@@ -55,14 +55,14 @@ def start_worker(module_name):
 
 def start_machine(module_name ,ports_mapping = []):
 
-	build = f'docker build -t {module_name} ./{module_name}'
-	subprocess.call((build))
+	build = f'sudo docker build -t {module_name} ./{module_name}'
+	subprocess.call((build),shell=True)
 	ports_str = ''
 	for port in ports_mapping:
 		ports_str += f' -p {port}:{port}'
-	run = f'docker run -d {ports_str} --name {module_name} --net=dbz  {module_name}'
+	run = f'sudo docker run -d {ports_str} --name {module_name} --add-host host.docker.internal:host-gateway --net=dbz  {module_name}'
 	try : 
-		subprocess.call((run))
+		subprocess.call((run),shell=True)
 		ip = get_ip(module_name)
 		print(f" {module_name} running on address {ip}")
 	except : 
@@ -70,9 +70,10 @@ def start_machine(module_name ,ports_mapping = []):
 	return ip
 
 def start_zookeeper(module_name = 'zookeeper'):
-	zoo_cmd = 'docker run -d --name zookeeper --network=dbz -e ALLOW_ANONYMOUS_LOGIN=yes bitnami/zookeeper'
+	zoo_cmd = "sudo docker run -d --name zookeeper --network=dbz -e ALLOW_ANONYMOUS_LOGIN=yes bitnami/zookeeper"
 	try : 
-		subprocess.call((zoo_cmd))
+
+		subprocess.call((zoo_cmd), shell=True)
 		ip = get_ip(module_name)
 		print(f" {module_name} running on address {ip}")
 	except : 
@@ -80,9 +81,9 @@ def start_zookeeper(module_name = 'zookeeper'):
 	return ip
 
 def start_kafka(module_name = 'kafka'):
-	kafka_cmd = 'docker run -d --name kafka --network=dbz -e KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 -e ZOOKEEPER_ADVERTISED_HOST_NAME=kafka -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092 -e ALLOW_PLAINTEXT_LISTENER=yes -e KAFKA_LISTENERS=PLAINTEXT://:9092 bitnami/kafka'
+	kafka_cmd = 'sudo docker run -d --name kafka --network=dbz -e KAFKA_ZOOKEEPER_CONNECT=host.docker.internal:2181 -e ZOOKEEPER_ADVERTISED_HOST_NAME=kafka -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://host.docker.internal:9092 -e ALLOW_PLAINTEXT_LISTENER=yes -e KAFKA_LISTENERS=PLAINTEXT://:9092 bitnami/kafka'
 	try : 
-		subprocess.call((kafka_cmd))
+		subprocess.call((kafka_cmd), shell=True)
 		ip = get_ip(module_name)
 		print(f" {module_name} running on address {ip}")
 	except : 
@@ -96,7 +97,7 @@ def update_ip_json(module_name , ip) :
 		json.dump(mapping , f)
 
 def is_running(module_name):
-	cmd = f'docker inspect {module_name} | grep "Running"'
+	cmd = f'sudo docker inspect {module_name} | grep "Running"'
 	try :
 		ans = subprocess.check_output(cmd , shell = True)
 		reply = ans.decode("UTF-8")
@@ -130,8 +131,8 @@ def get_faulty_module():
 		return jsonify({"Status": f'{module_name} is already running'})
 	
 	try :
-		remove = f'docker rm {module_name}'
-		subprocess.call((remove))
+		remove = f'sudo docker rm {module_name}'
+		subprocess.call((remove), shell=True)
 	except :
 		pass
 
@@ -181,20 +182,20 @@ def delete_logs():
 		print(f"Cleared log for {col} database")
 
 def create_new_docker_network(network_name = 'dbz'):
-	cmd = f'docker network create {network_name}'
+	cmd = f'sudo docker network create {network_name}'
 	try:
-		subprocess.call((cmd))
+		subprocess.call((cmd), shell=True)
 	except :
 		pass
 
 
 if __name__ == '__main__':
-	delete_logs()
+	# delete_logs()
 	create_new_docker_network()
-	zoo_ip = start_zookeeper()
-	mapping['zookeeper'] = zoo_ip
-	kafka_ip = start_kafka()
-	mapping['kafka'] = kafka_ip
+	# zoo_ip = start_zookeeper()
+	# mapping['zookeeper'] = zoo_ip
+	# kafka_ip = start_kafka()
+	# mapping['kafka'] = kafka_ip
 
 	for module_name in modules_to_bootstrap:
 		ip = up_machine(module_name)

@@ -96,7 +96,7 @@ def getKafkaIP():
 	# with  open ('ip_port.json', "r") as f:
 	#     data = json.load(f)
 	# kafka_platform_ip = data['allocatedPool']['Kafka']
-	kafka_platform_ip = 'kafka:9092'
+	kafka_platform_ip = 'host.docker.insternal:9092'
 	return kafka_platform_ip
 
 
@@ -236,7 +236,7 @@ def listenForInstruction():
 	print("hello from AM")
 	# listen_data = consume
 	consumer = KafkaConsumer('action_manager',
-	 bootstrap_servers = ['kafka:9092'],
+	 bootstrap_servers = ['host.docker.internal:9092'],
 	 auto_offset_reset = 'earliest',
 	 enable_auto_commit = True,
 	 group_id = 'my-group',

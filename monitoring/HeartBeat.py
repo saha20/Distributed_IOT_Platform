@@ -54,7 +54,7 @@ def get_heartbeat() :
     global heart_beat_dict_old, heart_beat_dict_new, heart_beat_status_dict
     consumer = KafkaConsumer(
         'HeartBeat',
-         bootstrap_servers=['kafka:9092'],
+         bootstrap_servers=['host.docker.internal:9092'],
          auto_offset_reset='latest',
          enable_auto_commit=True,
          group_id='my-group',
