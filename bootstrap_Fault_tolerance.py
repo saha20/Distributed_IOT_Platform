@@ -180,9 +180,17 @@ def delete_logs():
 		database.delete_many({})
 		print(f"Cleared log for {col} database")
 
+def create_new_docker_network(network_name = 'dbz'):
+	cmd = f'docker network create {network_name}'
+	try:
+		subprocess.call((cmd))
+	except :
+		pass
+
 
 if __name__ == '__main__':
 	delete_logs()
+	create_new_docker_network()
 	zoo_ip = start_zookeeper()
 	mapping['zookeeper'] = zoo_ip
 	kafka_ip = start_kafka()
