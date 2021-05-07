@@ -75,7 +75,7 @@ def startDeployment():
 	#State 4 completed
 	time.sleep(2)
 	#application manager topic
-	output_topic = 'action_service_topic'
+	output_topic = 'action_manager'
 	 
 	# send request to app repo to copy code files at machine
 	status = dh.SendFullRepo(machine_name, machinePassword, container_name, app_id, service_name, service_id, action_details)
@@ -202,5 +202,5 @@ if __name__ == '__main__':
 	print("Start Deployer Server\n")
 	thread2 = threading.Thread(target = initiateDeployer)
 	thread2.start()
-	dh.restartDeployer()
+	# dh.restartDeployer()
 	# app.run(host=socket.gethostbyname(socket.gethostname()), port = deployer_port, debug=False)

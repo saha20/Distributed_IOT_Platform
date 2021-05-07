@@ -43,14 +43,15 @@ def parse_notification_info(filename):
 	return notif_list
 
 
-def message_to_action_manager(display_msg, sensor_id, command, notif_list):
+def message_to_action_manager(display_msg, sensor_id, command, notif_list,service_id):
 
 	notif_string = json.dumps(notif_list)
 	print("notif_string ",notif_string)
 
 	output_request_to_actionmanager = {
 		"action_center":
-					{
+					{		
+							"service_id" : service_id,
 							"user_display" : display_msg,
 							"sensor_manager": [
 								{"sensor_id" : sensor_id},
@@ -59,5 +60,4 @@ def message_to_action_manager(display_msg, sensor_id, command, notif_list):
 							"notify_user" : notif_string
 					}
 	}
-
 	return output_request_to_actionmanager
