@@ -5,3 +5,5 @@ Stop all docker
 
 Remove all docker
  docker rm $(docker ps -aq)
+
+docker cp DeployerService.py deployer:/work_dir/
