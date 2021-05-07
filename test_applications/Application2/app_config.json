@@ -1,0 +1,139 @@
+{
+	"Application1":{
+	 "algorithms":{
+		"algo1":{
+		   "code":"control_sewing_service.py",
+		   "dependency":{
+			  
+		   },
+		   "environment":{
+			  "flask":"False",
+			  "python3-alpine":"False",
+			  "python3-packages":[
+				 
+			  ]
+		   },
+		   "sensors":{
+			  "sensor_type_1":{
+				 "sensor_type" : "stitch_setting",
+				 "all_sensors" : "no"
+			  },
+			  "sensor_type_2":{
+				 "sensor_type" : "thread_remaining",
+				 "all_sensors" : "no"
+			  },
+			  "sensor_type_3":{
+				 "sensor_type" : "hook_rotation",
+				 "all_sensors" : "no"
+			  }
+		   }
+		},
+		"algo2":{
+		   "code":"control_dyeing_service.py",
+		   "dependency":{
+			  
+		   },
+		   "environment":{
+			  "flask":"False",
+			  "python3":"False",
+			  "python3-packages":[
+				 
+			  ]
+		   },
+		   "sensors":{
+			  "sensor_type_1":{
+				 "sensor_type" : "temperature_sensors",
+				 "all_sensors" : "no"
+			  },
+			  "sensor_type_2":{
+				 "sensor_type" : "color_sensor",
+				 "all_sensors" : "no"
+			  },
+			  "sensor_type_3":{
+				 "sensor_type" : "camera_sensor",
+				 "all_sensors" : "no"
+			  }
+		   }
+		}
+	 },
+	 "application_id":"Application1",
+	 "developer_id":"user_1"
+	},
+	"Application2":{
+
+	 "algorithms":{
+		"algo1":{
+		   "code":"bus_service.py",
+		   "dependency":{
+			  
+		   },
+		   "environment":{
+			  "flask":"False",
+			  "python3-alpine":"False",
+			  "python3-packages":[
+				 
+			  ]
+		   },
+		   "sensors":{
+			  "sensor_type_1":{
+				 "sensor_type" : "temperature_iiith_bus",
+				 "all_sensors" : "no"
+			  },
+			  "sensor_type_2":{
+				 "sensor_type" : "gps_iiith_bus",
+				 "all_sensors" : "no"
+			  },
+			  "sensor_type_3":{
+				 "sensor_type" : "lux_iiith_bus",
+				 "all_sensors" : "no"
+			  },
+			  "sensor_type_4":{
+				 "sensor_type" : "biometric_iiith_bus",
+				 "all_sensors" : "no"
+			  }
+		   }
+		},
+		"algo2":{
+		   "code":"all_bus_service.py",
+		   "dependency":{
+			  
+		   },
+		   "environment":{
+			  "flask":"False",
+			  "python3-alpine":"False",
+			  "python3-packages":[
+				 
+			  ]
+		   },
+		   "sensors":{
+			  "sensor_type_1":{
+				 "sensor_type" : "gps_iiith_bus",
+				 "all_sensors" : "yes"
+			  }
+		   }
+		},
+		"algo3":{
+		   "code":"bus_barricade.py",
+		   "dependency":{
+			  
+		   },
+		   "environment":{
+			  "flask":"False",
+			  "python3-alpine":"False",
+			  "python3-packages":[
+				 
+			  ]
+		   },
+		   "sensors":{
+			  "sensor_type_1":{
+				 "sensor_type" : "gps_iiith_bus",
+				 "all_sensors" : "yes"
+			  }
+		   }
+		}
+	 },
+	 "application_id":"Application2",
+	 "developer_id":"user_1"
+	}
+}
+
