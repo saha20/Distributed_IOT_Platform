@@ -273,13 +273,6 @@ def scheduling_request():
 
     isScheduled = request.form['isScheduled']
 
-    if(isScheduled == False):
-        startTimes = None
-        durations = None
-    # startTimeDummy = "12:01:15,09:34:21"
-    # durationDummy = "01:01:10,00:02:15"
-    # locationDummy = "23.45:32.21,54.12:32"
-
     email = request.form['email'].split(',')
     mobile = request.form['mobile'].split(',')
     notify_user = list()
