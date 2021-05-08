@@ -192,10 +192,10 @@ def create_new_docker_network(network_name = 'dbz'):
 if __name__ == '__main__':
 	# delete_logs()
 	create_new_docker_network()
-	# zoo_ip = start_zookeeper()
-	# mapping['zookeeper'] = zoo_ip
-	# kafka_ip = start_kafka()
-	# mapping['kafka'] = kafka_ip
+	zoo_ip = start_zookeeper()
+	mapping['zookeeper'] = zoo_ip
+	kafka_ip = start_kafka()
+	mapping['kafka'] = kafka_ip
 
 	for module_name in modules_to_bootstrap:
 		ip = up_machine(module_name)

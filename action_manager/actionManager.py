@@ -23,7 +23,7 @@ stop_command = "stop"
 dburl = "mongodb://apurva:user123@cluster0-shard-00-00.p4xv2.mongodb.net:27017,cluster0-shard-00-01.p4xv2.mongodb.net:27017,cluster0-shard-00-02.p4xv2.mongodb.net:27017/IAS_test_1?ssl=true&replicaSet=atlas-auz41v-shard-0&authSource=admin&retryWrites=true&w=majority"
 db_name = "IAS_test_1"
 
-kafka_platform_ip = None
+kafka_platform_ip = 'kafka:9092'
 sms , email , sms_email = 1 , 2 , 3     
 
 
@@ -96,7 +96,7 @@ def getKafkaIP():
 	# with  open ('ip_port.json', "r") as f:
 	#     data = json.load(f)
 	# kafka_platform_ip = data['allocatedPool']['Kafka']
-	kafka_platform_ip = 'host.docker.insternal:9092'
+	kafka_platform_ip = 'kafka:9092'
 	return kafka_platform_ip
 
 
