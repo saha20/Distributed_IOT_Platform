@@ -112,7 +112,7 @@ def callfaultTolerance(module_name) :
 	# communicate fault tolerance 
 	
 def heartBeat():
-	kafka_platform_ip = 'host.docker.internal:9092'
+	kafka_platform_ip = 'kafka:9092'
 	producer = KafkaProducer(bootstrap_servers=[kafka_platform_ip],value_serializer =json_serializer)
 	while True:
 		t = time.localtime()

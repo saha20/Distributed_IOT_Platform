@@ -236,7 +236,7 @@ def listenForInstruction():
 	print("hello from AM")
 	# listen_data = consume
 	consumer = KafkaConsumer('action_manager',
-	 bootstrap_servers = ['host.docker.internal:9092'],
+	 bootstrap_servers = ['kafka:9092'],
 	 auto_offset_reset = 'earliest',
 	 enable_auto_commit = True,
 	 group_id = 'my-group',
