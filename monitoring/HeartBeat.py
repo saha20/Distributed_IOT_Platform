@@ -14,7 +14,7 @@ heart_beat_dict_new = dict()
 heart_beat_status_dict = dict()
 
 
-def callfaultTolerance(module_name) :
+def callfaultTolerance(module_name):
     print(f"{module_name} FAILED !!!")
     to_send={}
     to_send['module_name'] = module_name

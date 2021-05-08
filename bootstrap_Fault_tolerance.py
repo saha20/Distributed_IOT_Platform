@@ -40,7 +40,7 @@ def start_worker(module_name):
 	build = f'sudo docker build -t service_host ./service_host'
 	subprocess.call((build),shell=True)
 
-	cmd = f'sudo docker run -d  --add-host host.docker.internal:host-gateway --network dbz --name {module_name} service_host'
+	cmd = f'sudo docker run -d --network dbz --name {module_name} service_host'
 	try : 
 		subprocess.call((cmd),shell=True)
 		ip = get_ip(module_name)
@@ -60,7 +60,7 @@ def start_machine(module_name ,ports_mapping = []):
 	ports_str = ''
 	for port in ports_mapping:
 		ports_str += f' -p {port}:{port}'
-	run = f'sudo docker run -d {ports_str} --name {module_name} --add-host host.docker.internal:host-gateway --net=dbz  {module_name}'
+	run = f'sudo docker run -d {ports_str} --name {module_name} --net=dbz  {module_name}'
 	try : 
 		subprocess.call((run),shell=True)
 		ip = get_ip(module_name)
@@ -81,7 +81,7 @@ def start_zookeeper(module_name = 'zookeeper'):
 	return ip
 
 def start_kafka(module_name = 'kafka'):
-	kafka_cmd = 'sudo docker run -d --name kafka --network=dbz -e KAFKA_ZOOKEEPER_CONNECT=host.docker.internal:2181 -e ZOOKEEPER_ADVERTISED_HOST_NAME=kafka -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://host.docker.internal:9092 -e ALLOW_PLAINTEXT_LISTENER=yes -e KAFKA_LISTENERS=PLAINTEXT://:9092 bitnami/kafka'
+	kafka_cmd = 'sudo docker run -d --name kafka --network=dbz -e KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 -e ZOOKEEPER_ADVERTISED_HOST_NAME=kafka -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092 -e ALLOW_PLAINTEXT_LISTENER=yes -e KAFKA_LISTENERS=PLAINTEXT://:9092 bitnami/kafka'
 	try : 
 		subprocess.call((kafka_cmd), shell=True)
 		ip = get_ip(module_name)
