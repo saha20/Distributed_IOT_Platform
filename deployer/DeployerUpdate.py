@@ -129,7 +129,8 @@ def deployeActual(machineName, machinePassword, node_ip, app_id, service_name, s
 	#run service script file
 	filepath = './'+service_id+'/'+service_file
 	print("running file", filepath)
-	python_exec_cmd = f'python3 {filepath} {temp_topic} {output_topic} {service_id} {json_path}'
+	# python_exec_cmd = f'nohup python3 {filepath} {temp_topic} {output_topic} {service_id} {json_path} > /dev/null 2>&1 &'
+	python_exec_cmd = f'nohup python3 {filepath} {temp_topic} {output_topic} {service_id} {json_path} > /dev/null 2>&1 &'
 	# python_exec_cmd = f'python3 {filepath} {temp_topic} {output_topic} {service_id} {json_filename}'
 	# stdin,stdout,stderr = ssh_client.exec_command('python3 '+filepath+' '+temp_topic+' '+output_topic+' '+service_id+' '+json_filename)
 	stdin,stdout,stderr = ssh_client.exec_command(python_exec_cmd)
@@ -140,6 +141,7 @@ def deployeActual(machineName, machinePassword, node_ip, app_id, service_name, s
 	# print("pgrep -f "+ filepath")
 	stdin,stdout,stderr = ssh_client.exec_command('echo root | pgrep -f '+ filepath)
 	pids = list(stdout.readlines())[0].strip()
+	ssh_client.close()
 	print("process id is ---- ", pids)
 	# return stdout.readlines()[0]
 	return pids

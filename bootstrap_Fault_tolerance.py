@@ -10,7 +10,9 @@ collection_names = [
 	"deployer_logs",
 	"host_log",
 	"sensor_manager_logger_current",
-	"action_manager_log"
+	"action_manager_log",
+	"user_notifications",
+	"controller_notifications"
 	]
 	
 modules_to_bootstrap = [ 
@@ -60,7 +62,7 @@ def start_machine(module_name ,ports_mapping = []):
 	ports_str = ''
 	for port in ports_mapping:
 		ports_str += f' -p {port}:{port}'
-	run = f'sudo docker run -d {ports_str} --name {module_name} --net=dbz  {module_name}'
+	run = f'sudo docker run -d {ports_str} --add-host host.docker.internal:host-gateway --name {module_name} --net=dbz  {module_name}'
 	try : 
 		subprocess.call((run),shell=True)
 		ip = get_ip(module_name)

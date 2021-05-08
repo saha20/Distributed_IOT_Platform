@@ -23,7 +23,7 @@ stop_command = "stop"
 dburl = "mongodb://apurva:user123@cluster0-shard-00-00.p4xv2.mongodb.net:27017,cluster0-shard-00-01.p4xv2.mongodb.net:27017,cluster0-shard-00-02.p4xv2.mongodb.net:27017/IAS_test_1?ssl=true&replicaSet=atlas-auz41v-shard-0&authSource=admin&retryWrites=true&w=majority"
 db_name = "IAS_test_1"
 
-kafka_platform_ip = 'kafka:9092'
+kafka_platform_ip = None
 sms , email , sms_email = 1 , 2 , 3     
 
 
@@ -153,7 +153,7 @@ def doLogging(service_id, to_sensor_manager, to_notify_users, to_user_display, s
 				print("Multiple occurences of service with service_id "+service_id+" found!")
 
 		for x in collection.find():
-			print(x)
+			# print(x)
 			if ( (x["service_id"]) == service_id ):
 				myquery = { "service_id": service_id }
 				new_values = { "$set": { "state": sent_state } }
@@ -184,8 +184,10 @@ def notifySensorManager(service_id, to_sensor_manager, to_notify_users, to_user_
 				"sensor_id" : temp_list[0]["sensor_id"],
 				"command" : temp_list[1]["command"]
 			}
-			collection.insert_one(logging_entry)
-			print("inserted in db")
+			print(logging_entry["sensor_id"])
+			if logging_entry["sensor_id"] != 'None' :
+				collection.insert_one(logging_entry)
+				print("inserted in db")
 			count = 0
 			temp_list.clear()
 
@@ -197,13 +199,14 @@ def notifySensorManager(service_id, to_sensor_manager, to_notify_users, to_user_
 
 
 def notifyUsers(service_id, to_sensor_manager, to_notify_users, to_user_display, state):
-	sz = len(to_notify_users)
+	to_notify_users = to_notify_users.split(',')
 
 	for user_addr in to_notify_users:
+		user_addr = user_addr.strip()
 		if '@' in user_addr:
-			sendMail(user_addr, "hi... this is for testing")
+			sendMail(user_addr, to_user_display)
 		else:
-			sendSms(user_addr , "demo msg")
+			sendSms(user_addr , to_user_display)
 	# need to log after sending notification
 	# doLogging(service_id, to_sensor_manager, to_notify_users, to_user_display, state)            
 
@@ -221,7 +224,7 @@ def restartServices():
 				service_id = i['service_id']
 				to_sensor_manager = i['to_sensor_manager']
 				to_notify_users = i['to_notify_users']
-				to_user_display = i['to_sensor_manager']
+				to_user_display = i['to_user_display']
 				
 				notifySensorManager(service_id, to_sensor_manager, to_notify_users, to_user_display, state='stop')
 				notifyUsers(service_id, to_sensor_manager, to_notify_users, to_user_display, state='stop')
@@ -252,7 +255,8 @@ def listenForInstruction():
 		listen_data = message["action_center"]
 		service_id = listen_data["service_id"]
 		to_sensor_manager = listen_data["sensor_manager"]
-		to_notify_users = listen_data["notify_users"]
+		temp = listen_data["notify_users"]
+		to_notify_users = temp[1:len(temp)-1].replace('"', '')
 		to_user_display = listen_data["user_display"]
 		subject = to_user_display
 
@@ -263,7 +267,9 @@ def listenForInstruction():
 		if len(to_sensor_manager) > 0:
 			notifySensorManager(service_id, to_sensor_manager, to_notify_users, to_user_display, state='stop')
 
-		notifyUsers(service_id, to_sensor_manager, to_notify_users, to_user_display, state='stop')
+		if len(to_notify_users) > 0:
+			notifyUsers(service_id, to_sensor_manager, to_notify_users, to_user_display, state='stop')
+		
 		time.sleep(10)
 	
 

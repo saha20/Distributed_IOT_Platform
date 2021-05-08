@@ -23,7 +23,6 @@ app_repo_ip = 'app_repo'
 app_repo_port = 7007
 app = Flask(__name__)
 
-ui_url = 'http://ui:5959/transferFolder'
 
 dburl = "mongodb://apurva:user123@cluster0-shard-00-00.p4xv2.mongodb.net:27017,cluster0-shard-00-01.p4xv2.mongodb.net:27017,cluster0-shard-00-02.p4xv2.mongodb.net:27017/IAS_test_1?ssl=true&replicaSet=atlas-auz41v-shard-0&authSource=admin&retryWrites=true&w=majority"
 db_name = "IAS_test_1"
