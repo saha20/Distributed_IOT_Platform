@@ -202,5 +202,5 @@ if __name__ == '__main__':
 	print("Start Deployer Server\n")
 	thread2 = threading.Thread(target = initiateDeployer)
 	thread2.start()
-	# dh.restartDeployer()
+	dh.restartDeployer()
 	# app.run(host=socket.gethostbyname(socket.gethostname()), port = deployer_port, debug=False)

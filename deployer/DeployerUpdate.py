@@ -23,6 +23,8 @@ sm_url = "http://sensor_manager:5050"
 #scheduler url TODO: ask port
 sch_url = "http://scheduler:13337"
 
+
+
 #kafka_ip
 KAFKA_IP = 'kafka:9092'
 
@@ -49,21 +51,39 @@ collection = db['deployer_logs']
 # 	# os.system('sudo docker container rm -f '+container_id)
 
 def logLoadBalancer(req):
-	status = rq.post(lb_url+'/free_server', json = req)
+	try:
+		status = rq.post(lb_url+'/free_server', json = req)
+		if(status.json()['machine_name'] == '0'):
+			t.sleep(3)
+			logLoadBalancer(req)
+
+	except:
+		t.sleep(3)
+		logLoadBalancer(req)
 
 def informSensorManager(service_id):
 	print("here in inform sensor manager")
 	req = {}
 	req['serviceid'] = service_id
 	# rsp = rq.post(lb_url+'/return_host', json = req)
-	rsp = rq.post(sm_url+'/stopService', json = req)
-	print("received response---",rsp)
+	try:
+		rsp = rq.post(sm_url+'/stopService', json = req)
+		print("received response---",rsp)
+	except:
+		t.sleep(3)
+		informSensorManager(service_id)
+
  
 def informScheduler(service_id):
 	req = {}
 	req['service_id'] = service_id
-	rsp = rq.post(sch_url+'/aborted_service', json = req)
-	print("returned from sensor manager")
+	try:
+		rsp = rq.post(sch_url+'/aborted_service', json = req)
+		print("returned from sensor manager")
+	except:
+		t.sleep(3)
+		informScheduler(service_id)
+
  
 def stopService(pid,node_ip,machineName,machinePassword):
 	ssh_client = paramiko.SSHClient()
@@ -137,17 +157,36 @@ def SendFullRepo(machineName, machinePassword, machineIp, app_id, serviceName, s
 	req['action_details']   = action_details
 	# req['sensor_topic']		= sensor_topics
 	# req['output_topic']		= 'action_service_topic'
-	res = rq.post(url = appRepo_url+'/send_files_machine', json = req)
-	print('sent request to app repo')
+
+	try:
+		res = rq.post(url = appRepo_url+'/send_files_machine', json = req)
+		print('sent request to app repo')
+		if(res.json()['status'] == 'failed'):
+			t.sleep(3)
+			res = SendFullRepo(machineName, machinePassword, machineIp, app_id, serviceName, service_id, action_details)
+
+
+
+	except:
+		t.sleep(3)
+		res = SendFullRepo(machineName, machinePassword, machineIp, app_id, serviceName, service_id, action_details)
+
 	return res
+
 
 
 def getConfig(app_id):
 	req = {}
 	req['app_id'] = app_id
-	config_json = rq.post(appRepo_url+'/send_config_file', json = req)
-	config_json = config_json.json()
+	try:
+		config_json = rq.post(appRepo_url+'/send_config_file', json = req)
+		config_json = config_json.json()
+	except:
+		t.sleep(3)
+		config_json = getConfig(app_id)
+
 	return config_json
+
 
 
 
@@ -165,9 +204,18 @@ def get_sensor_topic(config_json, user_name, service_name,service_id,app_id, pla
 		'place_id' : place_id,
 		'config_file' : config_json
 	}
-	res = rq.post(url = sm_url+'/sensorManagerStartService', json = req)
-	print(res.json())
-	return res.json()['temporary_topic']
+
+	response = ''
+
+	try:
+		res = rq.post(url = sm_url+'/sensorManagerStartService', json = req)
+		print(res.json())
+		response = res.json()['temporary_topic']
+	except:
+		t.sleep(3)
+		response = get_sensor_topic(config_json, user_name, service_name,service_id,app_id, place_id)
+
+	return response
 
 
 def get_file_for_service(app_id, config_json, service_name):
@@ -198,9 +246,13 @@ def requestLoadBalancer(user_id, app_id, service_name, service_id):
 	#request ip port
 	print("\n\b in request Load balancer")
 
-	lb_response = rq.post(lb_url+'/return_host', json = "")
-	lb_response = lb_response.json()
-	node_ip = lb_response['machine_name']
+	try:
+		lb_response = rq.post(lb_url+'/return_host', json = "")
+		lb_response = lb_response.json()
+		node_ip = lb_response['machine_name']
+	except:
+		t.sleep(3)
+		node_ip = requestLoadBalancer(user_id, app_id, service_name, service_id)
 	# node_port = lb_response['port']
 	print("Got Load balancer ip port")
 
@@ -214,18 +266,6 @@ def requestLoadBalancer(user_id, app_id, service_name, service_id):
 	# rsp = rq.post(lb_url+'/log_application', json = req)
 	print("\n\b sent request in load balancer")
 	return node_ip
-
-def initActionManager(action_details,user_id, app_id, service_name, output_topic, service_id):
-	action_dict = action_details.load()
-	action_dict['user_id'] = user_id
-	action_dict['app_id'] = app_id
-	action_dict['service_name'] = service_name
-	action_dict['service_id'] = service_id
-	# action_dict['output_topic'] = 'to_action_manager'
-	action_details = json.dumps(action_dict)
-	producer = KafkaProducer(bootstrap_servers=KAFKA_IP,value_serializer=lambda v: json.dumps(v).encode('utf-8'))
-	producer.send('action_manager',action_details)
-
 
 
 def restartDeployer():
