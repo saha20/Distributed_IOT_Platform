@@ -15,6 +15,7 @@ import os
 from bson.json_util import dumps, loads
 import sensorCatalogueRegistration as sensorFunc
 import sensorInstanceRegistation as sensorInstanceFunc
+import getData as gD
 
 address_dict = {"Lapataganj" : { "lat" :"167","long" :"196"}}
 building_dict = {"Lapataganj" : ["Gorisaria and grandsons Garments Group"]}
@@ -63,7 +64,7 @@ def login():
         return render_template('login.html')
 
     # get the form data
-    username = request.form['username'] 
+    username = request.form['username']
     password = request.form['password']
 
     remember_me = False
@@ -504,11 +505,13 @@ def get_json_template():
     address_dict['floor'] = "None"
     address_dict['room_no'] = "None"
     sensor_catalogue_config["sensor_name"] = "None"
-    sensor_catalogue_config["sensor_type"] = "None"
+    sensor_catalogue_config["sensor_type_data_type"] = "None"
     sensor_catalogue_config['sensor_geolocation'] = {"lat" : "None", "long" : "None" }
     sensor_catalogue_config['sensor_address'] = address_dict
     sensor_catalogue_config['sensor_data_storage_details'] = temp_dict
     sensor_catalogue_config['sensor_api'] = "None"
+    sensor_catalogue_config['has_controller'] = "None"
+    sensor_catalogue_config['place_id'] = "None"
     sensor_info['sensor_catalogue_config'] = sensor_catalogue_config
     return sensor_info
 
@@ -518,14 +521,17 @@ def get_json_template():
 def catalogue_registeration_request():
     sensor_name = request.form['sensor_name']
     sensor_type =  request.form['sensor_type']
+    has_controller = request.form['sensor_controller']
     print("SensorName = ",sensor_name)
     print("SensorType = ",sensor_type)
+    print("Has Controller = ",has_controller)
     sensor_info = {}
     user = ""
     sensor_info = get_json_template()
     sensor_info["user_id"]=current_user.username
     sensor_info["sensor_catalogue_config"]["sensor_name"] = sensor_name
-    sensor_info["sensor_catalogue_config"]["sensor_type"] = sensor_type
+    sensor_info["sensor_catalogue_config"]["sensor_type_data_type"] = sensor_type
+    sensor_info["sensor_catalogue_config"]["has_controller"] = has_controller
     filepath = 'static/uploads/'+'sensor_catalogue_registration.json'
     with open(filepath,'w') as f:
         json.dump(sensor_info,f)
@@ -534,42 +540,85 @@ def catalogue_registeration_request():
     # requests.post('http://127.0.0.1:5005/sensorCatalogueRegistration/addSensorType',json=sensor_info)
     return render_template('index.html', user=current_user)
 
+def update_attr(sensor_reg_info, attr, value):
+    if value != '':
+        sensor_reg_info["sensor_address"][attr] = value
+    else:
+        sensor_reg_info["sensor_address"][attr] = "None"
+    return sensor_reg_info
 
 @app.route("/sensorsSelect" , methods=['GET', 'POST'])
 def test():
     select_sensor = request.form.get('comp_select')
-    select_area = request.form.get('area_select')
-    select_building = request.form.get('building_select')
-    select_floor = request.form.get('floor_select')
-    select_room = request.form.get('room_select')
+    select_area = request.form['area']
+    select_building = request.form['building']
+    select_floor = request.form['floor']
+    select_room = request.form['room']
+    place_id = request.form['place_id']
+    lat = request.form['lat']
+    long = request.form['long']
     sensor_info = get_json_template()
     sensor_data = sensorInstanceFunc.get_sensor_info(select_sensor)
+    print('sensor_data - ')
+    print(sensor_data)
     sensor_reg_info = sensor_info["sensor_catalogue_config"]
-    sensor_reg_info["place_id"] = "GGG_"+select_floor+"_"+select_room
+    sensor_reg_info["place_id"] = place_id
     sensor_reg_info["sensor_name"] = sensor_data["sensor_name"]
-    sensor_reg_info["sensor_type"] = sensor_data["sensor_type"]
-    sensor_reg_info["sensor_geolocation"] = address_dict[select_area]
-    sensor_reg_info["sensor_address"]["area"] = select_area
-    sensor_reg_info["sensor_address"]["building"] = select_building
-    sensor_reg_info["sensor_address"]["floor"] = select_floor
-    sensor_reg_info["sensor_address"]["room_no"] = select_room
+    sensor_reg_info["sensor_type_data_type"] = sensor_data["sensor_type_data_type"]
+    sensor_reg_info["has_controller"] = sensor_data["has_controller"]
+    if lat != '':
+        sensor_reg_info["sensor_geolocation"]["lat"] = lat
+    else:
+        sensor_reg_info["sensor_geolocation"]["lat"] = "167"
+    if long != '':
+        sensor_reg_info["sensor_geolocation"]["long"] = long
+    else:
+        sensor_reg_info["sensor_geolocation"]["long"] = "196"
+    sensor_reg_info = update_attr(sensor_reg_info,"area",select_area)
+    sensor_reg_info = update_attr(sensor_reg_info,"building",select_building)
+    sensor_reg_info = update_attr(sensor_reg_info,"floor",select_floor)
+    sensor_reg_info = update_attr(sensor_reg_info,"room_no",select_room)
     sensor_reg_info["sensor_data_storage_details"]["kafka"]["broker_ip"] = sensor_data["user_id"]
-    sensor_reg_info["sensor_data_storage_details"]["kafka"]["topic"] = "abc"
+    sensor_reg_info["sensor_data_storage_details"]["kafka"]["topic"] = "None"
     sensor_json = {}
     sensor_json["user_id"] = current_user.username
     sensor_json["sensor_reg_config"] = sensor_reg_info
     filepath = 'static/uploads/'+'sensor_instance_registration.json'
+    print('Sensor_json file - ',sensor_info)
     with open(filepath,'w') as f:
         json.dump(sensor_json,f)
 
     results= sensorInstanceFunc.fun2(sensor_json)
     return render_template('index.html', user=current_user)
 
+@app.route('/user-notifications', methods=["GET","POST"])
+def user_notifications():
+    return render_template('user-notifications.html', user=current_user)
 
+@app.route('/print_user_notifications', methods=["GET","POST"])
+def print_user_notifications():
+    notifyUsers, userDisplays = gD.getDataUser("IAS_test_1", "user_notifications")
+    result = []
+    result.append('User' + '   :   ' + 'notifications')
+    for i in range(len(notifyUsers)):
+        result.append(str(notifyUsers[i]) + '   :   ' + userDisplays[i])
+    return render_template('notifications.html', data = result, user=current_user)
+
+@app.route('/controller-notifications', methods=["GET","POST"])
+def controller_notifications():
+    return render_template('controller-notifications.html', user=current_user)
+
+@app.route('/print_controller_notifications', methods=["GET","POST"])
+def print_controller_notifications():
+    sensorIds, commands = gD.getDataController("IAS_test_1", "controller_notifications")
+    result = []
+    result.append('sensorIds' + '   :   ' + 'commands')
+    for i in range(len(sensorIds)):
+        result.append(str(sensorIds[i]) + '   :   ' + commands[i])
+    return render_template('notifications.html', data = result, user=current_user)
 
 if __name__ == "__main__":
 	# change to app.run(host="0.0.0.0"), if you want other machines to be able to reach the webserver.
     # db.create_all()
-    # call apurva's api and 
     app.run(port=9999, threaded=True, host='0.0.0.0')
     # app.run(host="localhost",port=5005)
