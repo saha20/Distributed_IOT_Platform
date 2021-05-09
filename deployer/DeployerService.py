@@ -121,7 +121,7 @@ def killed_service_update():
 	dh.informScheduler(service_id)
 
 	#Remove entry from mongoDB
-	collection.remove({'service_id': service_id})
+	# collection.remove({'service_id': service_id})
 
 	print('Service killed')
 	return jsonify({'status':'success'})
@@ -157,7 +157,7 @@ def stopDeployment():
 
 		#Remove entry from mongoDB
 		print("removing from DB")
-		collection.remove({'service_id': service_id})
+		# collection.remove({'service_id': service_id})
 	
 	print('Stopped service')
 	return jsonify({'status':'success'})

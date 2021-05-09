@@ -192,7 +192,7 @@ def create_new_docker_network(network_name = 'dbz'):
 
 
 if __name__ == '__main__':
-	# delete_logs()
+	delete_logs()
 	create_new_docker_network()
 	zoo_ip = start_zookeeper()
 	mapping['zookeeper'] = zoo_ip

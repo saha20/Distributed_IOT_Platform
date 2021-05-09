@@ -16,6 +16,27 @@ from bson.json_util import dumps, loads
 import sensorCatalogueRegistration as sensorFunc
 import sensorInstanceRegistation as sensorInstanceFunc
 import getData as gD
+import threading, time
+from kafka import KafkaProducer, KafkaConsumer
+
+def json_deserializer(data):
+    return json.dumps(data).decode('utf-8')
+
+def json_serializer(data):
+    return json.dumps(data).encode("utf-8")
+
+def heartBeat():
+    kafka_platform_ip = 'kafka:9092'
+    producer = KafkaProducer(bootstrap_servers=[kafka_platform_ip],value_serializer =json_serializer)
+    while True:
+        t = time.localtime()
+        current_time = int (time.strftime("%H%M%S", t))
+        # print(current_time)
+        data = {"module" : "app_ui" , "ts" : current_time , "Status" : 1 }
+        producer.send("HeartBeat", data)
+        producer.flush()
+        time.sleep(3)
+    
 
 address_dict = {"Lapataganj" : { "lat" :"167","long" :"196"}}
 building_dict = {"Lapataganj" : ["Gorisaria and grandsons Garments Group"]}
@@ -231,6 +252,15 @@ def download():
     # Returning file from appended path
     return send_file(filepath, as_attachment=True)
 
+@app.route('/download_application_artefact', methods=["GET","POST"])
+@login_required
+def download_application_artefact():
+    filename = "Application2.zip"
+    # Appending app path to upload folder path within app root folder
+    filepath = os.path.join(app.config['DOWNLOAD_FOLDER'],filename)
+    # Returning file from appended path
+    return send_file(filepath, as_attachment=True)
+
 @app.route('/scheduling_request_upload/', methods=["POST"])
 @login_required
 def scheduling_request_upload():
@@ -264,10 +294,11 @@ def correct_phone(phone):
 @login_required
 def scheduling_request():
     application_name = str(request.form['application_name'])
+    algo_name = str(request.form['algorithms'])
     location = str(request.form['location'])
 
-    startTimes = request.form['startTime'].split(',')
-    durations = request.form['duration'].split(',')
+    startTimes = str(request.form['startTime']).split(',')
+    durations = str(request.form['duration']).split(',')
     # all_sensor = request.form['all_sensor']
     message = request.form['message']
 
@@ -313,7 +344,7 @@ def scheduling_request():
             "user_id" : current_user.username,
             "application_name" : application_name,
             "algorithms" : {
-                "algorithm1" : {
+                algo_name : {
                     "isScheduled" : isScheduled,
                     "schedule" : {
                         "time" : {
@@ -613,5 +644,8 @@ def print_controller_notifications():
 if __name__ == "__main__":
 	# change to app.run(host="0.0.0.0"), if you want other machines to be able to reach the webserver.
     # db.create_all()
+    thread1 = threading.Thread(target = heartBeat)
+    thread1.start()
+    
     app.run(port=9999, threaded=True, host='0.0.0.0')
     # app.run(host="localhost",port=5005)

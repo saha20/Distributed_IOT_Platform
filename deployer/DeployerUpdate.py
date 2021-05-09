@@ -77,9 +77,11 @@ def informSensorManager(service_id):
 def informScheduler(service_id):
 	req = {}
 	req['service_id'] = service_id
+	serv_id = int(service_id)
 	try:
-		rsp = rq.post(sch_url+'/aborted_service', json = req)
-		print("returned from sensor manager")
+		# rsp = rq.post(sch_url+'/aborted_service', json = req)
+		rsp = rq.post(sch_url+f'/aborted_service/{serv_id}')
+		print("returned from scheduler")
 	except:
 		t.sleep(3)
 		informScheduler(service_id)
