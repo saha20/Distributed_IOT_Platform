@@ -82,9 +82,12 @@ def identify_services_status():
 
 					#notify deployer about the killed service
 					print("found killed service -- ", s_id)
-					res = rq.post(url = deployer_service_url+'/killed_service_update', json = req)
-					if s_id in services_dict.keys():
-						del services_dict[s_id]
+					try:
+						res = rq.post(url = deployer_service_url+'/killed_service_update', json = req)
+						if s_id in services_dict.keys():
+							del services_dict[s_id]
+					except:
+						pass
 
 				else:
 					print("setting sid 0")

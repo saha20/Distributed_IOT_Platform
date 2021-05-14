@@ -130,6 +130,9 @@ class Scheduler:
 
 scheduler = None
 
+def call_to_deployer(req):
+	requests.post(f"http://{DEPLOYER_HOSTNAME}:5001/startdeployment", json=req)
+
 def poll_scheduler_start(scheduler):
 	for _ in range(POLL_DURATION):
 		start_req_list = scheduler.poll_scheduling_queue()
@@ -139,7 +142,9 @@ def poll_scheduler_start(scheduler):
 			new_thread.start()
 			req['service_id'] = str(req['service_id'])
 			if DEPLOYER_HOSTNAME != "127.0.0.1":
-				requests.post(f"http://{DEPLOYER_HOSTNAME}:5001/startdeployment", json=req)
+				# requests.post(f"http://{DEPLOYER_HOSTNAME}:5001/startdeployment", json=req)
+				thread1 = threading.Thread(target = call_to_deployer, args=(req,))
+				thread1.start()
 		sleep(1)
 
 def poll_scheduler_end(scheduler):

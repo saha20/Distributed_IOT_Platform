@@ -37,7 +37,7 @@ def parse_notification_info(filename):
 	notif_list = []
 	f = open("./"+filename)
 	json_object = json.load(f)
-	for l in json_object['notify_user']:
+	for l in json_object['notify_users']:
 		notif_list.append(str(l))
 
 	return notif_list
@@ -57,7 +57,7 @@ def message_to_action_manager(display_msg, sensor_id, command, notif_list,servic
 								{"sensor_id" : sensor_id},
 								{"command": command}
 							],
-							"notify_user" : notif_string
+							"notify_users" : notif_string
 					}
 	}
 	return output_request_to_actionmanager

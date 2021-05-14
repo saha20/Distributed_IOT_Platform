@@ -23,7 +23,6 @@ app_repo_ip = 'app_repo'
 app_repo_port = 7007
 app = Flask(__name__)
 
-ui_url = 'http://ui:5959/transferFolder'
 
 dburl = "mongodb://apurva:user123@cluster0-shard-00-00.p4xv2.mongodb.net:27017,cluster0-shard-00-01.p4xv2.mongodb.net:27017,cluster0-shard-00-02.p4xv2.mongodb.net:27017/IAS_test_1?ssl=true&replicaSet=atlas-auz41v-shard-0&authSource=admin&retryWrites=true&w=majority"
 db_name = "IAS_test_1"
@@ -112,55 +111,58 @@ def get_files_to_local(application_filename):
 
 @app.route('/send_files_machine',methods=['GET', 'POST'])
 def sendAppToMachine():
-	print('hitted send file to machine')
-	req = request.json
-	machine_name = req['machineName']
-	machine_password = req['machinePassword']
-	machine_ip = req['machineIp']
-	app_id = req['app_id']
-	service_name = req['serviceName']
-	service_id = req['service_id']
-	action_details = req['action_details']
-	print('extracted values from deployer')
+	try:
+		print('hitted send file to machine')
+		req = request.json
+		machine_name = req['machineName']
+		machine_password = req['machinePassword']
+		machine_ip = req['machineIp']
+		app_id = req['app_id']
+		service_name = req['serviceName']
+		service_id = req['service_id']
+		action_details = req['action_details']
+		print('extracted values from deployer')
 
-	#create action json file
-	json_filename = str(service_id) + '.json'
-	with open('./helpers/'+json_filename, 'w') as outfile:
-		json.dump(action_details, outfile)
+		#create action json file
+		json_filename = str(service_id) + '.json'
+		with open('./helpers/'+json_filename, 'w') as outfile:
+			json.dump(action_details, outfile)
 
-	#download files from mongodb in repository folder
-	# application_filename = app_id+'.zip'
-	# get_files_to_local(application_filename)
+		#download files from mongodb in repository folder
+		# application_filename = app_id+'.zip'
+		# get_files_to_local(application_filename)
 
-	
-	#ssh to client
-	ssh_client = paramiko.SSHClient()
-	ssh_client.load_system_host_keys()
-	print('client created')
-	ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-	ssh_client.connect(hostname=machine_ip,username=machine_name,password=machine_password)
-	print('connected with ssh')
-	
-	stdin, stdout, stderr = ssh_client.exec_command("echo root | mkdir '"+service_id+"'")
-	stdin, stdout, stderr = ssh_client.exec_command("echo root | chmod 777 '"+service_id+"'")
-	ftp_conn = ssh_client.open_sftp()
-	files_path = './repository/'+app_id+'/src/'+service_name+'/'
+		
+		#ssh to client
+		ssh_client = paramiko.SSHClient()
+		ssh_client.load_system_host_keys()
+		print('client created')
+		ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+		ssh_client.connect(hostname=machine_ip,username=machine_name,password=machine_password)
+		print('connected with ssh')
+		
+		stdin, stdout, stderr = ssh_client.exec_command("echo root | mkdir '"+service_id+"'")
+		stdin, stdout, stderr = ssh_client.exec_command("echo root | chmod 777 '"+service_id+"'")
+		ftp_conn = ssh_client.open_sftp()
+		files_path = './repository/'+app_id+'/src/'+service_name+'/'
 
-	#copy all code files from given service directory to container
-	for files in listdir(files_path):
-		ftp_conn.put(files_path+files, './' + service_id+'/'+files)
+		#copy all code files from given service directory to container
+		for files in listdir(files_path):
+			ftp_conn.put(files_path+files, './' + service_id+'/'+files)
 
-	# place service_heartbeat file
-	ftp_conn.put('./helpers/service_heartbeat.py', './' + service_id+'/service_heartbeat.py')
+		# place service_heartbeat file
+		ftp_conn.put('./helpers/service_heartbeat.py', './' + service_id+'/service_heartbeat.py')
 
-	#place json file
-	ftp_conn.put('./helpers/'+json_filename, './' + service_id+'/'+json_filename)
+		#place json file
+		ftp_conn.put('./helpers/'+json_filename, './' + service_id+'/'+json_filename)
 
-	#place read_sensor_info file
-	ftp_conn.put('./helpers/read_sensor_info.py', './' + service_id+'/read_sensor_info.py')
-	
-	# ftp_conn.close()
-	print('done with ssh')
+		#place read_sensor_info file
+		ftp_conn.put('./helpers/read_sensor_info.py', './' + service_id+'/read_sensor_info.py')
+		
+		# ftp_conn.close()
+		print('done with ssh')
+	except:
+		return jsonify({"status":"failed"})
 	return jsonify({"status":"success"})
 
 
@@ -194,8 +196,8 @@ def heartBeat():
 
 
 if __name__ == "__main__":
-	# thread1 = threading.Thread(target = heartBeat)
-	# thread1.start()
+	thread1 = threading.Thread(target = heartBeat)
+	thread1.start()
 	app.run(host= '0.0.0.0', port=app_repo_port, debug=False)
 	# app.run(host=socket.gethostbyname(socket.gethostname()), port=app_repo_port, debug=False)
 	# t1 = threading.Thread(target=initiateAppRepo)

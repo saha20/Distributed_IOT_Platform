@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 import requests as rq
 import time
 
-slm_url = 'http://service_life_manager:8089/listen_services_heartbeat'
+slm_url = 'http://service_lcm:8089/listen_services_heartbeat'
 
 def sendHeartbeat(service_id):
 	while(1):

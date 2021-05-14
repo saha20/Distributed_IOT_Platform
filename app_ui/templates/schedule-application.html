@@ -68,7 +68,7 @@
                                     </div>
                                     <div class="radio">
                                         <label>
-                                            <input type="radio" name="isScheduled" id="optionsRadios2" value=False>Immediately
+                                            <input type="radio" name="isScheduled" id="option2" value=False>Immediately
                                         </label>
                                     </div>
                                 </div>
@@ -159,29 +159,29 @@
                                 </select>
                             </div>
                             
-                            <button type="submit" class="btn btn-default">Schedule</button>
+                            <button type="submit" class="btn btn-default">Schedule UI</button>
                             <button type="reset" class="btn btn-default">Reset</button>
                         </div>
                         
                     </form>
+                    
+                    <div class="col-lg-6"></div>
+                        <form method="POST" action="/download" enctype="multipart/form-data">
+                            <div class="col-lg-6">
+                                <label>Download Sample Request.json File</label>
+                                <button type="submit" class="btn btn-default">Download</button>
+                            </div>
+                        </form>
+                    </div>
 
-                    <form method="POST" action="/download" enctype="multipart/form-data">
-                        <div class="col-lg-6">
-                            <label>Download template.json for scheduling multiple request</label>
-                            <button type="submit" class="btn btn-default">Download</button>
-                        </div>
-                    </form>
-
-                    <form method="POST" action="/scheduling_request_upload/" enctype="multipart/form-data">
-                        <div class="form-group">
-                            <label>Upload Request file to schedule an application</label>
-                            <input type="file" name="file">
-                        </div>
-
-                        <button type="submit" class="btn btn-default">Upload</button>
-                        <button type="reset" class="btn btn-default">Reset</button>
-                    </form>
-
+                    <div class="col-lg-6">
+                        <form method="POST" action="/scheduling_request_upload/" enctype="multipart/form-data">
+                            <label>Schedule Bulk Request</label>
+                            <input type="file" name="file"></input>
+                            <button type="submit" class="btn btn-default">Schedule Bulk</button>
+                            <button type="reset" class="btn btn-default">Reset</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

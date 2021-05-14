@@ -121,7 +121,7 @@ def killed_service_update():
 	dh.informScheduler(service_id)
 
 	#Remove entry from mongoDB
-	collection.remove({'service_id': service_id})
+	# collection.remove({'service_id': service_id})
 
 	print('Service killed')
 	return jsonify({'status':'success'})
@@ -129,7 +129,7 @@ def killed_service_update():
 
 @app.route('/stopdeployment', methods = ['POST', 'GET'])
 def stopDeployment():
-  #TODO: Verify request coming from scheduler
+  	#TODO: Verify request coming from scheduler
 	req = request.json
 	user_id = req['user_id']
 	app_id = req['app_id']
@@ -157,7 +157,7 @@ def stopDeployment():
 
 		#Remove entry from mongoDB
 		print("removing from DB")
-		collection.remove({'service_id': service_id})
+		# collection.remove({'service_id': service_id})
 	
 	print('Stopped service')
 	return jsonify({'status':'success'})
@@ -187,20 +187,19 @@ def heartBeat():
 		producer.flush()
 		time.sleep(3)
 
-
-
-	
 def initiateDeployer():
-	app.run(host= '0.0.0.0', port = deployer_port, debug=False)	
-
-
-
+	app.run(host= '0.0.0.0', port = deployer_port, debug=False)
 
 if __name__ == '__main__':
+	
 	thread1 = threading.Thread(target = heartBeat)
 	thread1.start()
+
 	print("Start Deployer Server\n")
+	# app.run(host= '0.0.0.0', port = deployer_port, debug=False)
+
 	thread2 = threading.Thread(target = initiateDeployer)
 	thread2.start()
-	# dh.restartDeployer()
+	
+	dh.restartDeployer()
 	# app.run(host=socket.gethostbyname(socket.gethostname()), port = deployer_port, debug=False)

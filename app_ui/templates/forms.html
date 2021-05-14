@@ -45,11 +45,13 @@
                                 <label>Static Control</label>
                                 <p class="form-control-static">email@example.com</p>
                             </div> -->
+                            
 
                             <div class="form-group">
                                 <label>Upload Application in Zip Format</label>
                                 <input type="file" name="file">
                             </div>
+                            
 
                             <!-- <div class="form-group">
                                 <label>Text area</label>
@@ -146,7 +148,15 @@
                             <button type="reset" class="btn btn-default">Reset Button</button>
 
                         </form>
+                        
 
+                        <form method="POST" action="/download_application_artefact" enctype="multipart/form-data">
+                            <div class="col-lg-6">
+                                <label>Download Application Artefact</label>
+                                <button type="submit" class="btn btn-default">Download</button>
+                            </div>
+                        </form>
+                        
                     </div>
                     <!-- <div class="col-lg-6">
                         <h1>Disabled Form States</h1>

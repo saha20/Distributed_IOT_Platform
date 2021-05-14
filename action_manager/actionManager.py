@@ -255,7 +255,7 @@ def listenForInstruction():
 		listen_data = message["action_center"]
 		service_id = listen_data["service_id"]
 		to_sensor_manager = listen_data["sensor_manager"]
-		temp = listen_data["notify_user"]
+		temp = listen_data["notify_users"]
 		to_notify_users = temp[1:len(temp)-1].replace('"', '')
 		to_user_display = listen_data["user_display"]
 		subject = to_user_display
@@ -267,7 +267,9 @@ def listenForInstruction():
 		if len(to_sensor_manager) > 0:
 			notifySensorManager(service_id, to_sensor_manager, to_notify_users, to_user_display, state='stop')
 
-		notifyUsers(service_id, to_sensor_manager, to_notify_users, to_user_display, state='stop')
+		if len(to_notify_users) > 0:
+			notifyUsers(service_id, to_sensor_manager, to_notify_users, to_user_display, state='stop')
+		
 		time.sleep(10)
 	
 

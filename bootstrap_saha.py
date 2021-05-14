@@ -63,8 +63,8 @@ def start_zookeeper(module_name = 'zookeeper'):
 	return ip
 
 def start_kafka(module_name = 'kafka'):
-	kafka_cmd = 'docker run -d --name kafka --network=dbz -e KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 -e ZOOKEEPER_ADVERTISED_HOST_NAME=kafka -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092 -e ALLOW_PLAINTEXT_LISTENER=yes -e KAFKA_LISTENERS=PLAINTEXT://:9092 bitnami/kafka'
-	# kafka_cmd = 'docker run -d --name kafka --network=dbz -e KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 -e ZOOKEEPER_ADVERTISED_HOST_NAME=kafka -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092 -e KAFKA_LISTENER_SECURITY_PROTOCOL_MAP:PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT -e KAFKA_INTER_BROKER_LISTENER_NAME:PLAINTEXT -e ALLOW_PLAINTEXT_LISTENER=yes -e KAFKA_LISTENERS=PLAINTEXT://:9092,PLAINTEXT_HOST://localhost:29092 bitnami/kafka'
+	kafka_cmd = 'docker run -d --name kafka --network=dbz -e KAFKA_ZOOKEEPER_CONNECT=host.docker.internal:2181 -e ZOOKEEPER_ADVERTISED_HOST_NAME=kafka -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://host.docker.internal:9092 -e ALLOW_PLAINTEXT_LISTENER=yes -e KAFKA_LISTENERS=PLAINTEXT://:9092 bitnami/kafka'
+	# kafka_cmd = 'docker run -d --name kafka --network=dbz -e KAFKA_ZOOKEEPER_CONNECT=host.docker.internal:2181 -e ZOOKEEPER_ADVERTISED_HOST_NAME=kafka -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://host.docker.internal:9092,PLAINTEXT_HOST://localhost:29092 -e KAFKA_LISTENER_SECURITY_PROTOCOL_MAP:PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT -e KAFKA_INTER_BROKER_LISTENER_NAME:PLAINTEXT -e ALLOW_PLAINTEXT_LISTENER=yes -e KAFKA_LISTENERS=PLAINTEXT://:9092,PLAINTEXT_HOST://localhost:29092 bitnami/kafka'
 	
 	try : 
 		# subprocess.Popen(kafka_cmd)
