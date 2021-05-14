@@ -1,8 +1,0 @@
-app_ui (user gives reuqest)
-scheduler( sends request.json to deployer)
-deployer (extracts app details and go to app_repo)
-app_repo (to get config file)
-back to deployer
-load_balancer( get worker  node)
-back to deployer
-sensor__manager( to get temp topic)
