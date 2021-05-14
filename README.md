@@ -19,6 +19,8 @@
 ### About The Project
 
 [![Product Name Screen Shot][product-screenshot]]
+<img src="https://raw.githubusercontent.com/saha20/Distributed_IOT_Platform/main/project_images/containers.png" alt="banner">
+
 Use this space to demonstrate about the project.
 
 ### Built With
