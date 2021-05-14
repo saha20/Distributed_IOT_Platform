@@ -1,6 +1,6 @@
 #### Distributed IOT Platform
 
-[![Contributors][contributors-shield]][contributors-url]
+![Contributors][contributors-shield]][contributors-url]
 
 <!-- TABLE OF CONTENTS -->
 <details open="open">
@@ -30,13 +30,13 @@ Use this space to demonstrate about the project.
 
 ### Installation
 
-1. Set Up Free MongoDB Service at [https://www.mongodb.com/cloud/atlas](MongoDB)
+1. Set Up Free MongoDB Service at [MongoDB](https://www.mongodb.com/cloud/atlas)
 2. Clone the repo
    ```sh
    git clone https://github.com/saha20/Distributed_IOT_Platform
    ```
 3. Install docker
-   Guide available at [https://docs.docker.com/engine/install/ubuntu/](Docker Installation)
+   Guide available at [Docker Installation](https://docs.docker.com/engine/install/ubuntu/)
 
 <!-- USAGE EXAMPLES -->
 ### Usage
