@@ -18,6 +18,7 @@
 
 ### About The Project
 
+[![Product Name Screen Shot][product-screenshot]]
 Use this space to demonstrate about the project.
 
 ### Built With
@@ -86,3 +87,4 @@ To get into the terminal of the container
 <!-- MARKDOWN LINKS & IMAGES -->
 [contributors-shield]: https://img.shields.io/github/contributors/othneildrew/Best-README-Template.svg?style=for-the-badge
 [contributors-url]: https://github.com/saha20/Distributed_IOT_Platform/graphs/contributors
+[product-screenshot]: project_images/continaers.png
