@@ -1,6 +1,6 @@
 #### Distributed IOT Platform
 
-[Contributors][contributors-shield][contributors-url]
+[![Contributors][contributors-shield]][contributors-url]
 
 <!-- TABLE OF CONTENTS -->
 <details open="open">
@@ -84,4 +84,5 @@ To get into the terminal of the container
 ##### zip the applications in test_applications folder and put them in app_repo/repository
     
 <!-- MARKDOWN LINKS & IMAGES -->
+[contributors-shield]: https://img.shields.io/github/contributors/othneildrew/Best-README-Template.svg?style=for-the-badge
 [contributors-url]: https://github.com/saha20/Distributed_IOT_Platform/graphs/contributors
