@@ -1,16 +1,24 @@
 Stop all docker 
- sudo docker stop $(sudo docker ps -aq)
+    sudo docker stop $(sudo docker ps -aq)
 
 
 
 Remove all docker
- sudo docker rm $(sudo docker ps -aq)
+    sudo docker rm $(sudo docker ps -aq)
 
 docker cp Deployer  Service.py deployer:/work_dir/
 
 stopping zookeper
     sudo service stop zookeper
     sudo lsof -i:2181 (finds particular port has any process working on it or not)
+    
+To get into the terminal of the container
     sudo docker exec -it worker_node_2
     sudo docker exec -it worker_node_2 sh
+
+##### sudo docker build --tag app_ui_docker .
+##### sudo docker run --name app_ui_docker_v1 -p 5001:5001  app_ui_docker
+##### template update,
+##### dyanmic populate applications.
+##### zip the applications in test_applications folder and put them in app_repo/repository
     
