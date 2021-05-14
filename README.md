@@ -1,6 +1,6 @@
 #### Distributed IOT Platform
 
-![Contributors][contributors-shield]][contributors-url]
+[Contributors][contributors-shield][contributors-url]
 
 <!-- TABLE OF CONTENTS -->
 <details open="open">
@@ -37,6 +37,7 @@ Use this space to demonstrate about the project.
    ```
 3. Install docker
    Guide available at [Docker Installation](https://docs.docker.com/engine/install/ubuntu/)
+
 
 <!-- USAGE EXAMPLES -->
 ### Usage
