@@ -49,8 +49,8 @@ Screenshot of microservices running
 
 ### Running
 
-1. For Windows ``` python3 bootstrap_windows.py```
-2. For Linux ```python bootstrap_linux.py```
+1. For Windows ``` python bootstrap_windows.py```
+2. For Linux ```python3 bootstrap_linux.py```
 
 
 <!-- USAGE EXAMPLES -->
@@ -72,42 +72,19 @@ back to deployer
 sensor__manager( to get temp topic)
 
 ### Some useful commands
-stopping all images running 
-    ```
-    sudo docker stop $(sudo docker ps -aq)
-    ```
 
-removing all images running
-    ```
-    sudo docker rm $(sudo docker ps -aq)
-    ```
+1. stopping all images running ```sudo docker stop $(sudo docker ps -aq)```
+2. removing all images running ```sudo docker rm $(sudo docker ps -aq)```
+3. copying files/folder from localost to docker container ```docker cp Deployer  Service.py deployer:/work_dir/```
+4. stopping zookeper ```sudo service stop zookeper```
+5. Finding service running on port 2181 ```sudo lsof -i:2181 ```
+6. Exec into container ```sudo docker exec -it worker_node_2```
 
-copying files/folder from localost to docker container
-    ```
-    docker cp Deployer  Service.py deployer:/work_dir/
-    ```
+### Running Individual Containers
 
-stopping zookeper
-    ```
-    sudo service stop zookeper
-    ```
-
-    ```
-    sudo lsof -i:2181 (finds particular port has any process working on it or not)
-    ```
-
-To go into the terminal of the container
-    ```
-    sudo docker exec -it worker_node_2
-    ```
-
-    ```
-    sudo docker exec -it worker_node_2 sh
-    ```
-
-##### sudo docker build --tag app_ui_docker .
-##### sudo docker run --name app_ui_docker_v1 -p 5001:5001  app_ui_docker
-
+1. cd into service folder
+2. ```sudo docker build --tag app_ui_docker .```
+3. ```sudo docker run --name app_ui_docker_v1 -p port_no:port_no  app_ui_docker```
     
 <!-- MARKDOWN LINKS & IMAGES -->
 [contributors-shield]: https://img.shields.io/github/contributors/othneildrew/Best-README-Template.svg?style=for-the-badge
