@@ -16,7 +16,7 @@
   </ol>
 </details>
 
-### About The Project
+### About the Project
 
 This is a distributed IoT Platform where algorithm can be developed, this algorithm can use any sensor which are registered on platform. This sensor can also be registered on the platform by admin/developer.
 
@@ -53,6 +53,16 @@ Screenshot of microservices running
 2. For Linux ```python3 bootstrap_linux.py```
 
 
+### Running Individual Containers
+
+1. cd into service folder
+2. ```sudo docker build --tag app_ui_docker .```
+3. ```sudo docker run --name app_ui_docker_v1 -p port_no:port_no  app_ui_docker```
+
+### Running by Downloading Images from Docker Hub
+
+use this space for guide to download images and running directly from docker hub 
+
 <!-- USAGE EXAMPLES -->
 ### Usage
 
@@ -71,7 +81,7 @@ load_balancer( get worker  node)
 back to deployer
 sensor__manager( to get temp topic)
 
-### Some useful commands
+### Some Useful Commands
 
 1. stopping all images running ```sudo docker stop $(sudo docker ps -aq)```
 2. removing all images running ```sudo docker rm $(sudo docker ps -aq)```
@@ -80,11 +90,6 @@ sensor__manager( to get temp topic)
 5. Finding service running on port 2181 ```sudo lsof -i:2181 ```
 6. Exec into container ```sudo docker exec -it worker_node_2```
 
-### Running Individual Containers
-
-1. cd into service folder
-2. ```sudo docker build --tag app_ui_docker .```
-3. ```sudo docker run --name app_ui_docker_v1 -p port_no:port_no  app_ui_docker```
     
 <!-- MARKDOWN LINKS & IMAGES -->
 [contributors-shield]: https://img.shields.io/github/contributors/othneildrew/Best-README-Template.svg?style=for-the-badge
