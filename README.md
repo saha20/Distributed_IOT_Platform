@@ -47,6 +47,11 @@ Screenshot of microservices running
 3. Install docker
    Guide available at [Docker Installation](https://docs.docker.com/engine/install/ubuntu/)
 
+### Running
+
+1. For Windows ``` python3 bootstrap_windows.py```
+2. For Linux ```python bootstrap_linux.py```
+
 
 <!-- USAGE EXAMPLES -->
 ### Usage
