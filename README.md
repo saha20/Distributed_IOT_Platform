@@ -18,7 +18,13 @@
 
 ### About The Project
 
-[![Product Name Screen Shot][product-screenshot]]
+This is a distributed IoT Platform where algorithm can be developed, this algorithm can use any sensor which are registered on platform. This sensor can also be registered on the platform by admin/developer.
+
+
+<!-- [![Container Running Screenshot][product-screenshot]]
+<img src="https://raw.githubusercontent.com/saha20/Distributed_IOT_Platform/main/project_images/containers.png" alt="banner"> -->
+
+[![Container Running Screenshot][product-screenshot]]
 <img src="https://raw.githubusercontent.com/saha20/Distributed_IOT_Platform/main/project_images/containers.png" alt="banner">
 
 Use this space to demonstrate about the project.
@@ -89,4 +95,4 @@ To get into the terminal of the container
 <!-- MARKDOWN LINKS & IMAGES -->
 [contributors-shield]: https://img.shields.io/github/contributors/othneildrew/Best-README-Template.svg?style=for-the-badge
 [contributors-url]: https://github.com/saha20/Distributed_IOT_Platform/graphs/contributors
-[product-screenshot]: project_images/continaers.png
+[product-screenshot]: project_images/containers.png
