@@ -69,6 +69,22 @@ More Information About Platform Architecture ```project_documents/group_design_d
 
 use this space for guide to download images and running directly from docker hub 
 
+
+### Ports used by different modules
+
+1. kafka : 9092  
+2. zookeeper : 2181 
+3. app-ui : 9999
+4. app_repo : 7007
+5. deployer : 5001
+6. service_lm : 8089
+7. scheduler :13337
+8. load_balancer : 55555
+9. sensor_manager : 5050
+10. instance_reg_port : 7072
+11. catalogue_reg_port : 7071
+12. fault_tolerance : 6969
+13. worker_nodes : 5000
 <!-- USAGE EXAMPLES -->
 ### Usage
 
