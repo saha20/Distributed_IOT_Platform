@@ -24,10 +24,15 @@ This is a distributed IoT Platform where algorithm can be developed, this algori
 <!-- [![Container Running Screenshot][product-screenshot]]
 <img src="https://raw.githubusercontent.com/saha20/Distributed_IOT_Platform/main/project_images/containers.png" alt="banner"> -->
 
-Screenshot of Dashboard
+#### Screenshot of Dashboard
 ![DashBoard of IoT Platform][dashboard]
-Screenshot of microservices running
+
+#### Screenshot of microservices running
 ![Container Running Screenshot][product-screenshot]
+
+### Platform Architecture
+![Architecture][architecture]
+
 
 ### Built With
 
@@ -96,3 +101,4 @@ sensor__manager( to get temp topic)
 [contributors-url]: https://github.com/saha20/Distributed_IOT_Platform/graphs/contributors
 [product-screenshot]: project_images/containers.png
 [dashboard]: project_images/dashboard.png
+[architecture]: project_images/architecture.png
