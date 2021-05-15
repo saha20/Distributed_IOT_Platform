@@ -24,8 +24,8 @@ This is a distributed IoT Platform where algorithm can be developed, this algori
 <!-- [![Container Running Screenshot][product-screenshot]]
 <img src="https://raw.githubusercontent.com/saha20/Distributed_IOT_Platform/main/project_images/containers.png" alt="banner"> -->
 
-[![Container Running Screenshot][product-screenshot]]
-<img src="https://raw.githubusercontent.com/saha20/Distributed_IOT_Platform/main/project_images/containers.png" alt="banner">
+![Container Running Screenshot][product-screenshot]
+<!-- <img src="https://raw.githubusercontent.com/saha20/Distributed_IOT_Platform/main/project_images/containers.png" alt="banner"> -->
 
 Use this space to demonstrate about the project.
 
