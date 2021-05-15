@@ -27,8 +27,6 @@ This is a distributed IoT Platform where algorithm can be developed, this algori
 ![DashBoard of IoT Platform][dashboard]
 ![Container Running Screenshot][product-screenshot]
 
-Use this space to demonstrate about the project.
-
 ### Built With
 
 * [Bootstrap](https://getbootstrap.com)
@@ -68,24 +66,31 @@ load_balancer( get worker  node)
 back to deployer
 sensor__manager( to get temp topic)
 
-Stop all docker 
+### Some useful commands
+stopping all images running 
+    ```sh
     sudo docker stop $(sudo docker ps -aq)
+    ```
 
-
-
-Remove all docker
+removing all images running
+    ```sh
     sudo docker rm $(sudo docker ps -aq)
-
-docker cp Deployer  Service.py deployer:/work_dir/
+    ```
+copying files/folder from localost to docker container
+    ```sh
+    docker cp Deployer  Service.py deployer:/work_dir/
+    ```
 
 stopping zookeper
+    ```sh
     sudo service stop zookeper
     sudo lsof -i:2181 (finds particular port has any process working on it or not)
-    
-To get into the terminal of the container
+    ```
+To go into the terminal of the container
+    ```sh
     sudo docker exec -it worker_node_2
     sudo docker exec -it worker_node_2 sh
-
+    ```
 ##### sudo docker build --tag app_ui_docker .
 ##### sudo docker run --name app_ui_docker_v1 -p 5001:5001  app_ui_docker
 ##### template update,
