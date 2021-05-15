@@ -68,29 +68,32 @@ sensor__manager( to get temp topic)
 
 ### Some useful commands
 stopping all images running 
-    ```sh
+    ```
     sudo docker stop $(sudo docker ps -aq)
     ```
 
 removing all images running
-    ```sh
+    ```
     sudo docker rm $(sudo docker ps -aq)
     ```
+
 copying files/folder from localost to docker container
-    ```sh
+    ```
     docker cp Deployer  Service.py deployer:/work_dir/
     ```
 
 stopping zookeper
-    ```sh
+    ```
     sudo service stop zookeper
     sudo lsof -i:2181 (finds particular port has any process working on it or not)
     ```
+
 To go into the terminal of the container
-    ```sh
+    ```
     sudo docker exec -it worker_node_2
     sudo docker exec -it worker_node_2 sh
     ```
+
 ##### sudo docker build --tag app_ui_docker .
 ##### sudo docker run --name app_ui_docker_v1 -p 5001:5001  app_ui_docker
 ##### template update,
