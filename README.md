@@ -89,12 +89,12 @@ sensor__manager( to get temp topic)
 
 ### Some Useful Commands
 
-1. stopping all images running ```sudo docker stop $(sudo docker ps -aq)```
-2. removing all images running ```sudo docker rm $(sudo docker ps -aq)```
-3. copying files/folder from localost to docker container ```docker cp Deployer  Service.py deployer:/work_dir/```
+1. stopping all images running ```sudo docker stop $(sudo docker ps -aq)``` (remove sudo for windows)
+2. removing all images running ```sudo docker rm $(sudo docker ps -aq)``` (remove sudo for windows)
+3. copying files/folder from localost to docker container ```docker cp Deployer  Service.py deployer:/path_insisde_container/```
 4. stopping zookeper ```sudo service stop zookeper```
 5. Finding service running on port 2181 ```sudo lsof -i:2181 ```
-6. Exec into container ```sudo docker exec -it worker_node_2```
+6. Exec into container ```sudo docker exec -it worker_node_2 sh```
 
     
 <!-- MARKDOWN LINKS & IMAGES -->
