@@ -95,6 +95,8 @@ sensor__manager( to get temp topic)
 4. stopping zookeper ```sudo service stop zookeper```
 5. Finding service running on port 2181 ```sudo lsof -i:2181 ```
 6. Exec into container ```sudo docker exec -it worker_node_2```
+7. Removing all container, images, network that are dangling ```docker system prune```
+8. 
 
     
 <!-- MARKDOWN LINKS & IMAGES -->
